@@ -22,7 +22,7 @@ export const AuthLayout = ({ children }:AuthLayoutProps) => {
                                             <div className="position-relative h-100 d-flex flex-column">
                                                 <div className="mb-4">
                                                     <div className="d-block">
-                                                        <img src="/assets/images/logolight.png" height={108} />
+                                                        {/* <img src="/assets/images/logolight.png" height={108} /> */}
                                                     </div>
                                                 </div>
                                                 <div className="mt-auto">

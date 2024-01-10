@@ -6,7 +6,7 @@ export const Footer = () => {
                     <div className="col-lg-12">
                         <div className="text-center">
                             <p className="mb-0">
-                                © {new Date().getFullYear()}  Copyright by Excel HR
+                                © {new Date().getFullYear()}  Copyright by Renaissance Technical Institute
                             </p>
                         </div>
                     </div>

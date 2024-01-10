@@ -34,7 +34,7 @@ export const AccountDetailsPage = () => {
                     <div className="hstack text-white-50 gap-1">
                       <div className="me-2"><i className="ri-map-pin-user-line me-1 text-white-75 fs-16 align-middle" />Miami Lakes,
                         United States</div>
-                      <div><i className="ri-building-line me-1 text-white-75 fs-16 align-middle" />Excel
+                      <div><i className="ri-building-line me-1 text-white-75 fs-16 align-middle" />Renaissance Technical Institute
                       </div>
                     </div>
                   </div>

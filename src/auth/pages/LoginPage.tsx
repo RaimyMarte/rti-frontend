@@ -75,7 +75,7 @@ export const LoginPage = () => {
                 <div className="p-lg-5 p-4">
                     <div>
                         <h5 className="text-primary">Welcome Back !</h5>
-                        <p className="text-muted">Sign in to continue to Excel HR.</p>
+                        <p className="text-muted">Sign in to continue to Renaissance Technical Institute.</p>
                     </div>
                     <div className="mt-4">
                         <form onSubmit={handleSubmit(onFormSubmit)}>
