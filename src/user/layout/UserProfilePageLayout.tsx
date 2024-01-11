@@ -31,7 +31,7 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
     } = useForm<UpdateUserBody>();
 
     useEffect(() => {
-        if (user) {
+        if (user && usersRoles?.data) {
             setValue('FirstName', UserProfile?.FirstName || '');
             setValue('LastName', UserProfile?.LastName || '');
             setValue('NickName', UserProfile?.NickName || '');
@@ -43,7 +43,7 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
             setValue('Authorized', Authorized || true);
             setValue('Locked', Locked || false);
         }
-    }, [user]);
+    }, [user, usersRoles]);
 
     const onFormSubmit = async (data: UpdateUserBody) => {
         try {
