@@ -1,5 +1,5 @@
-import { excelHrApi } from './';
-import { getHeaders } from '../../helpers';
+import { rtiApi } from './';
+import { getHeaders } from '../../utils';
 import { ApiResponseInterface, UserApiResponseInterface, } from '../../interfaces';
 import Cookies from 'js-cookie';
 
@@ -22,7 +22,7 @@ interface ConfirmResetPasswordBody {
 }
 
 
-export const authApi = excelHrApi.injectEndpoints({
+export const authApi = rtiApi.injectEndpoints({
     endpoints: (builder) => ({
         login: builder.mutation<UserApiResponseInterface, LoginBody>({
             query: (credentials) => ({

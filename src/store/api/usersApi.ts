@@ -1,5 +1,5 @@
-import { UploadData, excelHrApi } from './';
-import { getHeaders, getHeadersWithoutContentType } from '../../helpers';
+import { UploadData, rtiApi } from './';
+import { getHeaders, getHeadersWithoutContentType } from '../../utils';
 import { ApiResponseInterface, } from '../../interfaces';
 
 export interface CreateUserBody {
@@ -22,10 +22,10 @@ export interface UpdateUserBody {
     LastName: string
     NickName: string
     UserName: string
-    Locked:boolean
+    Locked: boolean
     Gender: string
     Phone: string
-    UserRoleId: string
+    UserRoleId: number
     UserId: string
 }
 
@@ -34,12 +34,26 @@ export interface ChangePasswordNextLoginBody {
     ConfirmPassword: string;
 }
 
-export const usersApi = excelHrApi.injectEndpoints({
+export interface GetUsersQueries {
+    page: number
+    pageSize: number
+    search: string
+}
+
+export const usersApi = rtiApi.injectEndpoints({
     endpoints: (builder) => ({
 
-        getUsers: builder.query<ApiResponseInterface, void>({
+        getUsers: builder.query<ApiResponseInterface, GetUsersQueries>({
+            query: ({ page, pageSize, search }) => ({
+                url: `/get_users?page=${page}&pageSize=${pageSize}&search=${search}`,
+                headers: getHeaders(),
+            }),
+            providesTags: ['users'],
+        }),
+
+        getUsersForDropdown: builder.query<ApiResponseInterface, void>({
             query: () => ({
-                url: '/get_users',
+                url: '/get_users_dropdown',
                 headers: getHeaders(),
             }),
             providesTags: ['users'],
@@ -48,6 +62,7 @@ export const usersApi = excelHrApi.injectEndpoints({
         getUserById: builder.query<ApiResponseInterface, string>({
             query: (id: string) => ({
                 url: `/get_user/${id}`,
+                headers: getHeaders(),
             }),
             providesTags: ['users'],
         }),
@@ -105,6 +120,7 @@ export const usersApi = excelHrApi.injectEndpoints({
 
 export const {
     useGetUserByIdQuery,
+    useGetUsersForDropdownQuery,
     useGetUsersQuery,
     useCreateUserMutation,
     useUpdateUserMutation,

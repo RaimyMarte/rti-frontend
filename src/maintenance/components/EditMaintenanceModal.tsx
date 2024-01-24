@@ -1,10 +1,11 @@
-import { useForm } from 'react-hook-form';
-import { useEffect, useRef, useState } from 'react';
-import toast from 'react-hot-toast';
-import { MaintenanceBody, useUpdateMaintenanceMutation } from '../../store/api';
-import { isMutationSuccessResponse } from '../../helpers';
+import { ControllerCheckbox, ControllerTextInput } from '../../ui/components/form';
 import { ErrorAlert, Loading } from '../../ui/components';
+import { isMutationSuccessResponse } from '../../utils';
+import { MaintenanceBody, useUpdateMaintenanceMutation } from '../../store/api';
 import { MaintenanceInterface } from '../../interfaces';
+import { useEffect, useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 
 interface EditMaintenanceModalProps {
     maintenanceName: string
@@ -14,26 +15,24 @@ interface EditMaintenanceModalProps {
 
 export const EditMaintenanceModal = ({ activeMaintenance, maintenanceName, maintenanceButtonText }: EditMaintenanceModalProps) => {
     const [updateMaintenance, { isLoading: updateMaintenanceLoading, }] = useUpdateMaintenanceMutation()
+
     const [error, setError] = useState('')
 
     const closeButtonRef = useRef<HTMLButtonElement>(null);
 
+    const defaultValues: MaintenanceBody = {
+        Name: activeMaintenance?.Name || '',
+        Code: activeMaintenance?.Code || '',
+        Description: activeMaintenance?.Description || '',
+        Enabled: activeMaintenance?.Enabled || false,
+    };
+
     const {
         handleSubmit,
-        register,
+        control,
         reset,
-        formState: { errors: formErrors },
-        setValue,
-    } = useForm<MaintenanceBody>();
+    } = useForm<MaintenanceBody>({ defaultValues });
 
-    useEffect(() => {
-        if (activeMaintenance) {
-            setValue('Name', activeMaintenance?.Name || '');
-            setValue('Code', activeMaintenance?.Code || '');
-            setValue('Description', activeMaintenance?.Description || '');
-            setValue('Enabled', activeMaintenance?.Enabled || true);
-        }
-    }, [activeMaintenance]);
 
     const onFormSubmit = async (data: MaintenanceBody) => {
         if (activeMaintenance) {
@@ -49,8 +48,8 @@ export const EditMaintenanceModal = ({ activeMaintenance, maintenanceName, maint
 
                     toast.success(respData?.message)
 
-                    reset();
                     setError('')
+                    reset()
                     closeButtonRef.current?.click();
                 }
             } catch (error) {
@@ -58,6 +57,10 @@ export const EditMaintenanceModal = ({ activeMaintenance, maintenanceName, maint
             }
         }
     }
+
+    useEffect(() => {
+        reset(defaultValues as MaintenanceBody);
+    }, [activeMaintenance, reset]);
 
     return (
         <div className="modal fade" id="editMaintenanceModal" tabIndex={-1} aria-hidden="true" >
@@ -73,29 +76,42 @@ export const EditMaintenanceModal = ({ activeMaintenance, maintenanceName, maint
                         <div className="modal-body">
                             <div className="row g-3">
                                 <div className="col-lg-6">
-                                    <label className="form-label">Name <span className="text-danger">*</span></label>
-                                    <input type="text" {...register("Name", { required: 'Name is required', })} className="form-control" placeholder="Enter name" />
-                                    {formErrors?.Name && <div className='text-danger invalid-input'>{formErrors?.Name.message}</div>}
+                                    <ControllerTextInput
+                                        name="Name"
+                                        control={control}
+                                        label="Name"
+                                        rules={{
+                                            required: 'Name is required',
+                                        }}
+                                        placeholder="Enter name"
+                                    />
                                 </div>
 
                                 <div className="col-lg-6">
-                                    <label className="form-label">Code</label>
-                                    <input type="text"  {...register("Code")} className="form-control" placeholder="Enter code" />
-                                    {formErrors?.Code && <div className='text-danger invalid-input'>{formErrors?.Code.message}</div>}
+                                    <ControllerTextInput
+                                        name="Code"
+                                        control={control}
+                                        label="Code"
+                                        placeholder="Enter code"
+                                    />
                                 </div>
 
                                 <div className="col-lg-12">
-                                    <label className="form-label">Description</label>
-                                    <input type="text"  {...register("Description")} className="form-control" placeholder="Enter description" />
-                                    {formErrors?.Description && <div className='text-danger invalid-input'>{formErrors?.Description.message}</div>}
+                                    <ControllerTextInput
+                                        name="Description"
+                                        control={control}
+                                        label="Description"
+                                        placeholder="Enter description"
+                                    />
                                 </div>
 
                                 <div className="col-lg-6">
                                     <div className="form-check form-switch">
-                                        <input className="form-check-input" type="checkbox" role="switch" defaultChecked={true} {...register("Enabled")} />
-                                        <label className="form-check-label" htmlFor="flexRadioDefault1">
-                                            Enabled
-                                        </label>
+                                        <ControllerCheckbox
+                                            control={control}
+                                            name="Enabled"
+                                            label="Enabled"
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -108,7 +124,7 @@ export const EditMaintenanceModal = ({ activeMaintenance, maintenanceName, maint
                         <div className="modal-footer">
                             <div className="hstack gap-2 justify-content-end">
                                 <button type="button" className="btn btn-light" data-bs-dismiss="modal" ref={closeButtonRef}>Close</button>
-                                <button type="submit" className="btn btn-success" id="add-btn">Edit {maintenanceButtonText}</button>
+                                <button type="submit" className="btn btn-success" id="add-btn">Save {maintenanceButtonText}</button>
                             </div>
                         </div>
                     </form>

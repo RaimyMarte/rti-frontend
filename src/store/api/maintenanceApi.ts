@@ -1,5 +1,5 @@
-import { excelHrApi } from ".";
-import { getHeaders } from '../../helpers';
+import { rtiApi } from ".";
+import { getHeaders } from '../../utils';
 import { ApiResponseInterface } from "../../interfaces";
 
 interface MaintenanceById {
@@ -23,11 +23,31 @@ export interface UpdateMaintenance extends MaintenanceById {
     body: MaintenanceBody
 }
 
-export const maintenanceApi = excelHrApi.injectEndpoints({
+interface GetAllMaintenanceWithPaginationQueries {
+    page: number
+    pageSize: number
+    search: string
+    maintenanceName: string
+}
+
+export const maintenanceApi = rtiApi.injectEndpoints({
     endpoints: (builder) => ({
         getMaintenance: builder.query<ApiResponseInterface, string>({
             query: (maintenanceName) => `/maintenance_get_all/${maintenanceName}`,
             providesTags: ['maintenances'],
+        }),
+
+        getMaintenanceWithPagination: builder.query<ApiResponseInterface, GetAllMaintenanceWithPaginationQueries>({
+            query: ({ maintenanceName, page, pageSize, search }) => `/maintenance_get_all_with_pagination/${maintenanceName}?page=${page}&pageSize=${pageSize}&search=${search}`,
+            providesTags: ['maintenances'],
+        }),
+
+        getSelectedMaintenances: builder.query<ApiResponseInterface, string[]>({
+            query: (selectedMaintenances) => ({
+                url: '/get_all_selected_maintenances',
+                method: 'POST',
+                body: { selectedMaintenances },
+            }),
         }),
 
         getMaintenanceById: builder.query<ApiResponseInterface, MaintenanceById>({
@@ -39,7 +59,7 @@ export const maintenanceApi = excelHrApi.injectEndpoints({
             query: ({ maintenanceName, body }) => ({
                 url: `/maintenance_create/${maintenanceName}`,
                 method: 'POST',
-                body: body,
+                body,
                 headers: getHeaders(),
             }),
             invalidatesTags: ['maintenances'],
@@ -49,7 +69,7 @@ export const maintenanceApi = excelHrApi.injectEndpoints({
             query: ({ maintenanceName, maintenanceId, body }) => ({
                 url: `/maintenance_update/${maintenanceName}/${maintenanceId}`,
                 method: 'PATCH',
-                body: body,
+                body,
                 headers: getHeaders(),
             }),
             invalidatesTags: ['maintenances'],
@@ -68,6 +88,8 @@ export const maintenanceApi = excelHrApi.injectEndpoints({
 
 export const {
     useGetMaintenanceQuery,
+    useGetMaintenanceWithPaginationQuery,
+    useGetSelectedMaintenancesQuery,
     useGetMaintenanceByIdQuery,
     useUpdateMaintenanceMutation,
     useCreateMaintenanceMutation,

@@ -1,17 +1,28 @@
 import { useAppDispatch, useAppSelector } from "."
-import { onToggleSidebar } from "../store/ui"
+import { onToggleMenu } from "../store/ui"
 
 export const useUiStore = () => {
-    const { isSidebarOpen, } = useAppSelector(state => state.ui)
+    const {
+        accountsMenu,
+        adminMenu,
+        lettersMenu,
+        maintenanceMenu,
+        managmentMenu,
+    } = useAppSelector(state => state.ui)
+
     const dispatch = useAppDispatch()
 
-    const handleToggleSidebar = () => dispatch(onToggleSidebar())
+    const toggleMenu = (menuName: string) => dispatch(onToggleMenu(menuName))
 
     return {
         //Properties
-        isSidebarOpen,
+        accountsMenu,
+        adminMenu,
+        lettersMenu,
+        maintenanceMenu,
+        managmentMenu,
 
         //Methods
-        handleToggleSidebar,
+        toggleMenu,
     }
 }

@@ -1,3 +1,4 @@
+import './i18n/i18n';
 import './styles.css'
 import { App } from './App'
 import { BrowserRouter } from 'react-router-dom'

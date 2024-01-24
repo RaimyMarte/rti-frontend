@@ -34,12 +34,16 @@ export interface UserInterface {
     NickName: string
     Gender: string
   } | null
-  UserRoleId: string | null;
+  UserRoleId: number;
+  TFAEnabled: boolean;
+  TFADate: Date | null;
 }
 
 export interface UserApiResponseInterface extends ApiResponseInterface {
   data: {
     user: UserInterface | null;
     token?: string | null;
+    userId?: string;
+    TFAEnabled?: boolean
   };
 }

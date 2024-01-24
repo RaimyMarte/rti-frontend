@@ -1,15 +1,14 @@
-import { ErrorAlert, Loading } from '../../../ui/components';
-import { isMutationSuccessResponse } from '../../../helpers';
-import { MaintenanceInterface } from '../../../interfaces';
+import { CheckboxComponent, PasswordInput, SelectComponent, TextInputComponent } from '../../../ui/components/form';
 import { CreateUserBody, useCreateUserMutation, useGetMaintenanceQuery } from '../../../store/api';
-import { useForm } from 'react-hook-form';
-import { useRef, useState } from 'react';
+import { ErrorAlert, Loading } from '../../../ui/components';
+import { isMutationSuccessResponse } from '../../../utils';
+import { MaintenanceInterface } from '../../../interfaces';
+import { useForm, useWatch } from 'react-hook-form';
+import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export const CreateUserModal = () => {
     const { data: usersRoles, isLoading: usersRolesLoading, } = useGetMaintenanceQuery('UserRole')
-    const [showPassword, setShowPassword] = useState(false)
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
     const [createUser, { isLoading: createUserLoading, }] = useCreateUserMutation()
     const [error, setError] = useState('')
@@ -21,10 +20,16 @@ export const CreateUserModal = () => {
         register,
         formState: { errors: formErrors },
         reset,
-        watch,
+        setValue,
+        control,
     } = useForm<CreateUserBody>()
 
-    const watchAutomaticPassword = watch('AutomaticPassword')
+    const watchAutomaticPassword = useWatch({ control, name: "AutomaticPassword" })
+
+    useEffect(() => {
+        setValue('AutomaticPassword', true)
+    }, [])
+
 
     const onFormSubmit = async (data: CreateUserBody) => {
         try {
@@ -62,39 +67,57 @@ export const CreateUserModal = () => {
                         <div className="modal-body">
                             <div className="row g-3">
                                 <div className="col-lg-6">
-                                    <label className="form-label">First Name <span className="text-danger">*</span></label>
-                                    <input type="text" {...register("FirstName", { required: 'FirstName is required', })} className="form-control" placeholder="Enter first name" />
-                                    {formErrors?.FirstName && <div className='text-danger invalid-input'>{formErrors?.FirstName.message}</div>}
+                                    <TextInputComponent
+                                        name="FirstName"
+                                        register={register}
+                                        formErrors={formErrors}
+                                        label="First Name"
+                                        rules={{
+                                            required: 'First name is required',
+                                        }}
+                                        placeholder="Enter first name"
+                                    />
                                 </div>
                                 <div className="col-lg-6">
-                                    <label className="form-label">Last Name <span className="text-danger">*</span></label>
-                                    <input type="text"  {...register("LastName", { required: 'LastName is required', })} className="form-control" placeholder="Enter last name" />
-                                    {formErrors?.LastName && <div className='text-danger invalid-input'>{formErrors?.LastName.message}</div>}
+                                    <TextInputComponent
+                                        name="LastName"
+                                        register={register}
+                                        formErrors={formErrors}
+                                        label="Last Name"
+                                        rules={{
+                                            required: 'Last name is required',
+                                        }}
+                                        placeholder="Enter last name"
+                                    />
                                 </div>
 
                                 <div className="col-lg-12">
-                                    <label className="form-label">Email <span className="text-danger">*</span></label>
-                                    <input
-                                        type="text"
-                                        {...register("Email",
-                                            {
-                                                required: 'Email is required',
-                                                pattern: {
-                                                    value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
-                                                    message: 'Invalid email address',
-                                                },
-                                            })}
-                                        className="form-control"
+                                    <TextInputComponent
+                                        name="Email"
+                                        register={register}
+                                        formErrors={formErrors}
+                                        label="Email"
+                                        rules={{
+                                            required: 'Email is required',
+                                            pattern: {
+                                                value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
+                                                message: 'Invalid email address',
+                                            },
+                                        }}
                                         placeholder="Enter email"
                                     />
-                                    {formErrors?.Email && <div className='text-danger invalid-input'>{formErrors?.Email.message}</div>}
                                 </div>
 
                                 <div className="col-lg-6">
-                                    <label className="form-label">Role <span className="text-danger">*</span></label>
-                                    <select className="form-control"  {...register("UserRoleId", { required: 'User role is required', })} data-choices data-choices-search-false>
-                                        <option value="">Select a role</option>
-                                        {
+                                    <SelectComponent
+                                        name="UserRoleId"
+                                        register={register}
+                                        formErrors={formErrors}
+                                        label="User Role"
+                                        rules={{
+                                            required: 'User role is required',
+                                        }}
+                                        options={
                                             usersRoles?.data.map((role: MaintenanceInterface) => {
                                                 const { Name, Id } = role
 
@@ -103,31 +126,38 @@ export const CreateUserModal = () => {
                                                 )
                                             })
                                         }
-                                    </select>
-                                    {formErrors?.UserRoleId && <div className='text-danger invalid-input'>{formErrors?.UserRoleId.message}</div>}
+                                    />
                                 </div>
 
                                 <div className="col-lg-6">
-                                    <label className="form-label">Phone</label>
-                                    <input type="text"  {...register("Phone")} className="form-control" placeholder="Enter phone number" />
-                                    {formErrors?.Phone && <div className='text-danger invalid-input'>{formErrors?.Phone.message}</div>}
+                                    <TextInputComponent
+                                        name="Phone"
+                                        register={register}
+                                        formErrors={formErrors}
+                                        label="Phone"
+                                        placeholder="Enter phone number"
+                                    />
                                 </div>
 
                                 <div className="col-lg-6">
                                     <div className="form-check">
-                                        <input className="form-check-input" type="checkbox" role="switch" defaultChecked={true} {...register("Authorized")} />
-                                        <label className="form-check-label" htmlFor="flexRadioDefault1">
-                                            Authorized
-                                        </label>
+                                        <CheckboxComponent
+                                            register={register}
+                                            name="Authorized"
+                                            label="Authorized"
+                                            defaultChecked={true}
+                                        />
                                     </div>
                                 </div>
 
                                 <div className="col-lg-6">
                                     <div className="form-check form-switch">
-                                        <input className="form-check-input" type="checkbox" role="switch" defaultChecked={true} {...register("AutomaticPassword")} />
-                                        <label className="form-check-label" htmlFor="flexRadioDefault1">
-                                            Automatic Password
-                                        </label>
+                                        <CheckboxComponent
+                                            register={register}
+                                            name="AutomaticPassword"
+                                            label="Automatic Password"
+                                            defaultChecked={true}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -136,73 +166,33 @@ export const CreateUserModal = () => {
                                 !watchAutomaticPassword
                                     ? <div className="row g-3 mt-2">
                                         <div className="col-lg-6">
-                                            <label className="form-label" htmlFor="password-input">Password <span className="text-danger">*</span></label>
-                                            <div className="position-relative auth-pass-inputgroup">
-                                                <input
-                                                    type={showPassword ? "text" : "password"}
-                                                    className="form-control pe-5 password-input"
-                                                    placeholder="Enter password"
-                                                    {...register("Password", {
-                                                        required: 'Password is required',
-                                                        minLength: {
-                                                            value: 8,
-                                                            message: 'Password must be at least 8 characters',
-                                                        },
-                                                        pattern: {
-                                                            value: /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/,
-                                                            message: 'The password must have at least one uppercase letter, one lowercase letter, and one number.',
-                                                        },
-                                                    })}
-                                                    aria-describedby="passwordInput"
-                                                />
-                                                <button
-                                                    className="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon"
-                                                    type="button"
-                                                    onClick={() => setShowPassword((prev) => !prev)}
-                                                >
-                                                    <i className="ri-eye-fill align-middle" />
-                                                </button>
-                                            </div>
-                                            {formErrors?.Password && <div className='text-danger invalid-input'>{formErrors?.Password.message}</div>}
+                                            <PasswordInput
+                                                name="Password"
+                                                label="Password"
+                                                register={register}
+                                                formErrors={formErrors}
+                                                activeAllRules
+                                            />
                                         </div>
 
                                         <div className="col-lg-6">
-                                            <label className="form-label" htmlFor="password-input">Confirm password <span className="text-danger">*</span></label>
-                                            <div className="position-relative auth-pass-inputgroup">
-                                                <input
-                                                    type={showConfirmPassword ? "text" : "password"}
-                                                    className="form-control pe-5 password-input"
-                                                    placeholder="Enter password"
-                                                    {...register("ConfirmPassword", {
-                                                        required: 'Password is required',
-                                                        minLength: {
-                                                            value: 8,
-                                                            message: 'Password must be at least 8 characters',
-                                                        },
-                                                        pattern: {
-                                                            value: /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/,
-                                                            message: 'The password must have at least one uppercase letter, one lowercase letter, and one number.',
-                                                        },
-                                                    })}
-                                                    aria-describedby="passwordInput"
-                                                />
-                                                <button
-                                                    className="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon"
-                                                    type="button"
-                                                    onClick={() => setShowConfirmPassword((prev) => !prev)}
-                                                >
-                                                    <i className="ri-eye-fill align-middle" />
-                                                </button>
-                                            </div>
-                                            {formErrors?.ConfirmPassword && <div className='text-danger invalid-input'>{formErrors?.ConfirmPassword.message}</div>}
+                                            <PasswordInput
+                                                name="ConfirmPassword"
+                                                label="Confirm Password"
+                                                register={register}
+                                                formErrors={formErrors}
+                                                activeAllRules
+                                            />
                                         </div>
 
                                         <div className="col-lg-6">
                                             <div className="form-check form-switch">
-                                                <input className="form-check-input" type="checkbox" id="formCheck6" {...register("ChangePwdNextLogin")} />
-                                                <label className="form-check-label" htmlFor="formCheck6">
-                                                    Change Password Next Login
-                                                </label>
+                                                <CheckboxComponent
+                                                    register={register}
+                                                    name="ChangePwdNextLogin"
+                                                    label="Change Password Next Login"
+                                                    defaultChecked={true}
+                                                />
                                             </div>
                                         </div>
                                     </div>

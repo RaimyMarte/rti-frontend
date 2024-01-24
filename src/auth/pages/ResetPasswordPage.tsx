@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom"
 import { ChangePasswordPageLayout } from "../layout"
-import { isMutationSuccessResponse } from "../../helpers"
+import { isMutationSuccessResponse } from "../../utils"
 import { useConfirmResetPasswordMutation, useGetIPQuery } from "../../store/api"
 import { useForm } from "react-hook-form"
 import { useState } from "react"

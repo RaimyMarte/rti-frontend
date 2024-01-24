@@ -1,4 +1,4 @@
-import { excelHrApi, ipGeolocationApi } from './api'
+import { rtiApi, ipGeolocationApi } from './api'
 import { authSlice } from './auth'
 import { configureStore } from '@reduxjs/toolkit'
 import { uiSlice } from './ui'
@@ -7,13 +7,13 @@ export const store = configureStore({
     reducer: {
         auth: authSlice.reducer,
         ui: uiSlice.reducer,
-        [excelHrApi.reducerPath]: excelHrApi.reducer,
+        [rtiApi.reducerPath]: rtiApi.reducer,
         [ipGeolocationApi.reducerPath]: ipGeolocationApi.reducer,
     },
 
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware()
-            .concat(excelHrApi.middleware)
+            .concat(rtiApi.middleware)
             .concat(ipGeolocationApi.middleware)
 })
 

@@ -1,2 +1,1 @@
-export * from './AccountDetailsTabs'
-export * from './CreateAccountModal'
+export * from './profile/AccountProfileTabs'

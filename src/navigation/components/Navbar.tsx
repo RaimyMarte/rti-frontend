@@ -1,20 +1,36 @@
 import { ApiMutationResponse, ApiResponseInterface } from "../../interfaces";
+import { Link } from "react-router-dom";
 import { Loading } from "../../ui/components";
 import { useAuthStore, } from "../../hooks"
 import { useLogoutMutation } from "../../store/api"
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
-import { Link } from "react-router-dom";
-import { useState } from "react";
 
 const usersPublicUrl: string = `${import.meta.env.VITE_API_PUBLIC_URL}/users`
 const isSuccessResponse = (response: ApiMutationResponse): response is { data: ApiResponseInterface } => {
     return (response as { data: ApiResponseInterface }).data !== undefined;
 }
 
+const flags: { [key: string]: string } = {
+    en: 'us',
+    es: 'spain',
+    fr: 'french'
+};
+
+
 export const Navbar = () => {
     const { handleLogoutState, user } = useAuthStore()
     const { Picture, DisplayName, UserRole } = user || {};
+
+    const { i18n, t } = useTranslation();
+    const currentLanguage = i18n.language
+
+    const onChangeLang = (lang_code: string) => {
+        i18n.changeLanguage(lang_code);
+        Cookies.set('language', lang_code);
+    }
 
     const [logout, { isLoading: logoutLoading, }] = useLogoutMutation()
 
@@ -90,19 +106,23 @@ export const Navbar = () => {
                         </div>
                         <div className="dropdown ms-1 topbar-head-dropdown header-item">
                             <button type="button" className="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img id="header-lang-img" src="/assets/images/flags/us.svg" alt="Header Language" height={20} className="rounded" />
+                                <img id="header-lang-img" src={`/assets/images/flags/${flags[currentLanguage]}.svg`} alt="Header Language" height={20} className="rounded" />
                             </button>
                             <div className="dropdown-menu dropdown-menu-end">
-                                {/* item*/}
-                                <a href="javascript:void(0);" className="dropdown-item notify-item language py-2" data-lang="en" title="English">
+                                <button onClick={() => onChangeLang('en')} className="dropdown-item notify-item language py-2" data-lang="en" title="English">
                                     <img src="/assets/images/flags/us.svg" alt="user-image" className="me-2 rounded" height={18} />
                                     <span className="align-middle">English</span>
-                                </a>
-                                {/* item*/}
-                                <a href="javascript:void(0);" className="dropdown-item notify-item language" data-lang="sp" title="Spanish">
+                                </button>
+
+                                <button onClick={() => onChangeLang('es')} className="dropdown-item notify-item language" data-lang="sp" title="Spanish">
                                     <img src="/assets/images/flags/spain.svg" alt="user-image" className="me-2 rounded" height={18} />
                                     <span className="align-middle">Español</span>
-                                </a>
+                                </button>
+
+                                <button onClick={() => onChangeLang('fr')} className="dropdown-item notify-item language" data-lang="sp" title="Spanish">
+                                    <img src="/assets/images/flags/french.svg" alt="user-image" className="me-2 rounded" height={18} />
+                                    <span className="align-middle">Français</span>
+                                </button>
                             </div>
                         </div>
                         <div className="dropdown topbar-head-dropdown ms-1 header-item">
@@ -576,16 +596,16 @@ export const Navbar = () => {
                             </button>
                             <div className="dropdown-menu dropdown-menu-end">
                                 {/* item*/}
-                                <h6 className="dropdown-header">Welcome {DisplayName}!</h6>
+                                <h6 className="dropdown-header">{t('Welcome')} {DisplayName}!</h6>
                                 <h6 className="dropdown-header">{UserRole?.Name}!</h6>
-                                <Link className="dropdown-item" to="/user/profile"><i className="mdi mdi-account-circle text-muted fs-16 align-middle me-1" /> <span className="align-middle">Profile</span></Link>
-                                <a className="dropdown-item" href="apps-chat.html"><i className="mdi mdi-message-text-outline text-muted fs-16 align-middle me-1" /> <span className="align-middle">Messages</span></a>
-                                <a className="dropdown-item" href="apps-tasks-kanban.html"><i className="mdi mdi-calendar-check-outline text-muted fs-16 align-middle me-1" /> <span className="align-middle">Taskboard</span></a>
-                                <a className="dropdown-item" href="pages-faqs.html"><i className="mdi mdi-lifebuoy text-muted fs-16 align-middle me-1" /> <span className="align-middle">Help</span></a>
+                                <Link className="dropdown-item" to="/user/profile"><i className="mdi mdi-account-circle text-muted fs-16 align-middle me-1" /> <span className="align-middle">{t('Profile')}</span></Link>
+                                <a className="dropdown-item" href="apps-chat.html"><i className="mdi mdi-message-text-outline text-muted fs-16 align-middle me-1" /> <span className="align-middle">{t('Messages')}</span></a>
+                                <a className="dropdown-item" href="apps-tasks-kanban.html"><i className="mdi mdi-calendar-check-outline text-muted fs-16 align-middle me-1" /> <span className="align-middle">{t('Taskboard')}</span></a>
+                                <a className="dropdown-item" href="pages-faqs.html"><i className="mdi mdi-lifebuoy text-muted fs-16 align-middle me-1" /> <span className="align-middle">{t('Help')}</span></a>
                                 <div className="dropdown-divider" />
-                                <a className="dropdown-item" href="pages-profile-settings.html"><span className="badge bg-soft-success text-success mt-1 float-end">New</span><i className="mdi mdi-cog-outline text-muted fs-16 align-middle me-1" /> <span className="align-middle">Settings</span></a>
-                                <a className="dropdown-item" href="auth-lockscreen-basic.html"><i className="mdi mdi-lock text-muted fs-16 align-middle me-1" /> <span className="align-middle">Lock screen</span></a>
-                                <button onClick={onLogout} className="dropdown-item"><i className="mdi mdi-logout text-muted fs-16 align-middle me-1" /> <span className="align-middle" data-key="t-logout">Logout</span></button>
+                                <a className="dropdown-item" href="pages-profile-settings.html"><i className="mdi mdi-cog-outline text-muted fs-16 align-middle me-1" /> <span className="align-middle">{t('Settings')}</span></a>
+                                <a className="dropdown-item" href="auth-lockscreen-basic.html"><i className="mdi mdi-lock text-muted fs-16 align-middle me-1" /> <span className="align-middle">{t('LockScreen')}</span></a>
+                                <button onClick={onLogout} className="dropdown-item"><i className="mdi mdi-logout text-muted fs-16 align-middle me-1" /> <span className="align-middle" data-key="t-logout">{t('Logout')}</span></button>
                             </div>
                         </div>
                     </div>

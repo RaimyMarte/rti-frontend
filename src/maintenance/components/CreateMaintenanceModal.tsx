@@ -1,9 +1,10 @@
+import { CheckboxComponent, TextInputComponent } from '../../ui/components/form';
+import { ErrorAlert, Loading } from '../../ui/components';
+import { isMutationSuccessResponse } from '../../utils';
+import { MaintenanceBody, useCreateMaintenanceMutation } from '../../store/api';
 import { useForm } from 'react-hook-form';
 import { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { MaintenanceBody, useCreateMaintenanceMutation } from '../../store/api';
-import { isMutationSuccessResponse } from '../../helpers';
-import { ErrorAlert, Loading } from '../../ui/components';
 
 interface CreateMaintenanceModalProps {
     maintenanceName: string
@@ -59,29 +60,46 @@ export const CreateMaintenanceModal = ({ maintenanceName, maintenanceButtonText 
                         <div className="modal-body">
                             <div className="row g-3">
                                 <div className="col-lg-6">
-                                    <label className="form-label">Name <span className="text-danger">*</span></label>
-                                    <input type="text" {...register("Name", { required: 'Name is required', })} className="form-control" placeholder="Enter name" />
-                                    {formErrors?.Name && <div className='text-danger invalid-input'>{formErrors?.Name.message}</div>}
+                                    <TextInputComponent
+                                        name="Name"
+                                        register={register}
+                                        formErrors={formErrors}
+                                        label="Name"
+                                        rules={{
+                                            required: 'Name is required',
+                                        }}
+                                        placeholder="Enter name"
+                                    />
                                 </div>
 
                                 <div className="col-lg-6">
-                                    <label className="form-label">Code</label>
-                                    <input type="text"  {...register("Code")} className="form-control" placeholder="Enter code" />
-                                    {formErrors?.Code && <div className='text-danger invalid-input'>{formErrors?.Code.message}</div>}
+                                    <TextInputComponent
+                                        name="Code"
+                                        register={register}
+                                        formErrors={formErrors}
+                                        label="Code"
+                                        placeholder="Enter code"
+                                    />
                                 </div>
 
                                 <div className="col-lg-12">
-                                    <label className="form-label">Description</label>
-                                    <input type="text"  {...register("Description")} className="form-control" placeholder="Enter description" />
-                                    {formErrors?.Description && <div className='text-danger invalid-input'>{formErrors?.Description.message}</div>}
+                                    <TextInputComponent
+                                        name="Description"
+                                        register={register}
+                                        formErrors={formErrors}
+                                        label="Description"
+                                        placeholder="Enter description"
+                                    />
                                 </div>
 
                                 <div className="col-lg-6">
                                     <div className="form-check form-switch">
-                                        <input className="form-check-input" type="checkbox" role="switch" defaultChecked={true} {...register("Enabled")} />
-                                        <label className="form-check-label" htmlFor="flexRadioDefault1">
-                                            Enabled
-                                        </label>
+                                        <CheckboxComponent
+                                            register={register}
+                                            name="Enabled"
+                                            label="Enabled"
+                                            defaultChecked={true}
+                                        />
                                     </div>
                                 </div>
                             </div>

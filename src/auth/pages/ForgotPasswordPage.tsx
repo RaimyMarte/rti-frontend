@@ -2,8 +2,9 @@ import { ApiMutationResponse, ApiResponseInterface } from "../../interfaces"
 import { AuthLayout } from "../layout/AuthLayout"
 import { Link, useNavigate } from "react-router-dom"
 import { Loading } from "../../ui/components"
-import { useForm } from "react-hook-form"
 import { RequestResetPasswordBody, useGetIPQuery, useRequestResetPasswordMutation } from "../../store/api"
+import { TextInputComponent } from "../../ui/components/form"
+import { useForm } from "react-hook-form"
 import { useState } from "react"
 import toast from 'react-hot-toast';
 
@@ -70,9 +71,16 @@ export const ForgotPasswordPage = () => {
           <div className="p-2">
             <form onSubmit={handleSubmit(onFormSubmit)}>
               <div className="mb-4">
-                <label htmlFor="UserNameOrEmail" className="form-label">Username or Email <span className="text-danger">*</span></label>
-                <input type="text" className="form-control" {...register("UserNameOrEmail", { required: 'Username or Email is required', })} placeholder="Enter username or email" />
-                {formErrors?.UserNameOrEmail && <div className='text-danger invalid-input'>{formErrors?.UserNameOrEmail.message}</div>}
+                <TextInputComponent
+                  name="UserNameOrEmail"
+                  register={register}
+                  formErrors={formErrors}
+                  label="Username or Email"
+                  rules={{
+                    required: 'Username or Email is required',
+                  }}
+                  placeholder="Enter username or email"
+                />
               </div>
 
               <div className="text-center mt-4">

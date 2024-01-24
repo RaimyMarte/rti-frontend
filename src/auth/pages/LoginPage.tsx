@@ -1,11 +1,12 @@
 import { AuthLayout } from "../layout/AuthLayout"
+import { ErrorAlert, Loading } from "../../ui/components"
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query"
 import { Link } from "react-router-dom"
-import { ErrorAlert, Loading } from "../../ui/components"
+import { LoginBody, useGetIPQuery, useLoginMutation, } from "../../store/api"
+import { PasswordInput, TextInputComponent } from "../../ui/components/form"
 import { SerializedError } from "@reduxjs/toolkit"
 import { useAuthStore } from "../../hooks"
 import { useForm, } from "react-hook-form"
-import { LoginBody, useGetIPQuery, useLoginMutation, } from "../../store/api"
 import { UserApiResponseInterface } from "../../interfaces"
 import { useState } from "react"
 import toast from 'react-hot-toast';
@@ -25,9 +26,7 @@ export const LoginPage = () => {
     const { data: dataIpApi, isLoading: dataIpApiLoading } = useGetIPQuery()
 
     const [login, { isLoading: loginLoading, }] = useLoginMutation()
-    const { handleLoginState, handleLogoutState, } = useAuthStore()
-
-    const [showPassword, setShowPassword] = useState(false)
+    const { handleLoginState, handleLogoutState, handleUserTFAState } = useAuthStore()
 
     const [error, setError] = useState('')
 
@@ -56,7 +55,15 @@ export const LoginPage = () => {
                     return;
                 }
 
-                handleLoginState(respData?.data?.user);
+                if (respData?.data?.TFAEnabled) {
+                    handleUserTFAState({
+                        TFAEnabled: respData?.data?.TFAEnabled,
+                        userId: respData?.data?.userId
+                    })
+                } else {
+                    handleLoginState(respData?.data?.user);
+                }
+
                 toast.success(respData?.message)
 
                 reset();
@@ -75,25 +82,33 @@ export const LoginPage = () => {
                 <div className="p-lg-5 p-4">
                     <div>
                         <h5 className="text-primary">Welcome Back !</h5>
-                        <p className="text-muted">Sign in to continue to Renaissance Technical Institute.</p>
+                        <p className="text-muted">Sign in to continue</p>
                     </div>
                     <div className="mt-4">
                         <form onSubmit={handleSubmit(onFormSubmit)}>
                             <div className="mb-3">
-                                <label htmlFor="UserNameOrEmail" className="form-label">Username or Email <span className="text-danger">*</span></label>
-                                <input type="text" className="form-control" {...register("UserNameOrEmail", { required: 'Username or Email is required', })} placeholder="Enter username or email" />
-                                {formErrors?.UserNameOrEmail && <div className='text-danger invalid-input'>{formErrors?.UserNameOrEmail.message}</div>}
+                                <TextInputComponent
+                                    name="UserNameOrEmail"
+                                    register={register}
+                                    formErrors={formErrors}
+                                    label="Username or Email"
+                                    rules={{
+                                        required: 'Username or Email is required',
+                                    }}
+                                    placeholder="Enter username or email"
+                                />
                             </div>
                             <div className="mb-3">
                                 <div className="float-end">
                                     <Link to="/auth/recover_password" className="text-muted">Forgot password?</Link>
                                 </div>
-                                <label className="form-label" htmlFor="password-input">Password <span className="text-danger">*</span></label>
-                                <div className="position-relative auth-pass-inputgroup mb-3">
-                                    <input type={showPassword ? "text" : "password"} className="form-control pe-5 password-input" placeholder="Enter password" {...register("Password", { required: 'Password is required', })} />
-                                    <button className="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon" type="button" onClick={() => setShowPassword((prev) => !prev)}><i className="ri-eye-fill align-middle" /></button>
-                                    {formErrors?.Password && <div className='text-danger invalid-input'>{formErrors?.Password.message}</div>}
-                                </div>
+
+                                <PasswordInput
+                                    name="Password"
+                                    label="Password"
+                                    register={register}
+                                    formErrors={formErrors}
+                                />
                             </div>
                             <div className="form-check">
                                 <input className="form-check-input" type="checkbox" id="auth-remember-check" />

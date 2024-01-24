@@ -8,8 +8,8 @@ export interface UploadData {
   formData: FormData
 }
 
-export const excelHrApi = createApi({
-  reducerPath: "excelHrApi",
+export const rtiApi = createApi({
+  reducerPath: "rtiApi",
   tagTypes: ['users', 'maintenances', 'logUser', 'accounts'],
 
   baseQuery: fetchBaseQuery({

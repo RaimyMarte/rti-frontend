@@ -1,11 +1,14 @@
-import { isMutationSuccessResponse } from "../../helpers"
-import { Loading } from "../../ui/components"
-import { UpdateUserBody, useGetMaintenanceQuery, useUpdateUserMutation, useUploadUserPictureMutation } from "../../store/api"
-import { useEffect } from "react"
-import { useForm } from "react-hook-form"
+import { ControllerCheckbox, ControllerSelect, ControllerTextInput } from "../../ui/components/form"
+import { isMutationSuccessResponse } from "../../utils"
+import { ConfirmModal, Loading } from "../../ui/components"
 import { MaintenanceInterface, UserInterface } from "../../interfaces"
+import { UpdateUserBody, useDisableTFAMutation, useGetMaintenanceQuery, useUpdateUserMutation, useUploadUserPictureMutation } from "../../store/api"
+import { useForm } from "react-hook-form"
 import { useSaveImage } from "../../hooks"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
+import { TwoFactorAuthConfigModal } from "../components"
+import { useRef } from "react"
 
 interface UserProfilePageLayoutProps {
     user: UserInterface
@@ -16,34 +19,54 @@ const usersPublicUrl: string = `${import.meta.env.VITE_API_PUBLIC_URL}/users`
 export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
     const { Id, Picture, UserProfile, Phone, Email, UserName, UserRoleId, Authorized, Locked } = user
 
+    const { t } = useTranslation()
+
     const { data: usersRoles, isLoading: usersRolesLoading, } = useGetMaintenanceQuery('UserRole')
     const [uploadUserPicture, { isLoading: isUploadUserPictureLoading }] = useUploadUserPictureMutation()
 
     const { onSaveImage, fileInputRef, imagePreview, onFileInputChange, } = useSaveImage({ uploadApiFn: uploadUserPicture, elementId: user?.Id || '' })
 
     const [updateUser, { isLoading: updateUserLoading, }] = useUpdateUserMutation()
+    const [disableTFA, { isLoading: disableTFALoading, }] = useDisableTFAMutation()
+
+    const defaultValues = {
+        FirstName: UserProfile?.FirstName || '',
+        LastName: UserProfile?.LastName || '',
+        NickName: UserProfile?.NickName || '',
+        Gender: UserProfile?.Gender || '',
+        Phone: Phone || '',
+        Email: Email || '',
+        UserName: UserName || '',
+        Authorized,
+        Locked,
+        UserRoleId: UserRoleId || 0,
+    }
 
     const {
         handleSubmit,
-        register,
-        formState: { errors: formErrors },
-        setValue,
-    } = useForm<UpdateUserBody>();
+        control,
+    } = useForm<UpdateUserBody>({ defaultValues });
 
-    useEffect(() => {
-        if (user && usersRoles?.data) {
-            setValue('FirstName', UserProfile?.FirstName || '');
-            setValue('LastName', UserProfile?.LastName || '');
-            setValue('NickName', UserProfile?.NickName || '');
-            setValue('Gender', UserProfile?.Gender || '');
-            setValue('Phone', Phone || '');
-            setValue('Email', Email || '');
-            setValue('UserName', UserName || '');
-            setValue('UserRoleId', UserRoleId || '');
-            setValue('Authorized', Authorized || true);
-            setValue('Locked', Locked || false);
+
+    const closeButtonRef = useRef<HTMLButtonElement>(null);
+    const onDisableTFA = async () => {
+        try {
+            const response = await disableTFA();
+            if (isMutationSuccessResponse(response)) {
+                const { data: respData } = response
+
+                if (!respData?.isSuccess) {
+                    toast.error(respData?.message)
+                    return;
+                }
+
+                toast.success(respData?.message)
+                closeButtonRef.current?.click();
+            }
+        } catch (error) {
+            toast.error('Error')
         }
-    }, [user, usersRoles]);
+    }
 
     const onFormSubmit = async (data: UpdateUserBody) => {
         try {
@@ -122,7 +145,7 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
                                     <h5 className="card-title mb-0">Complete Your Profile</h5>
                                 </div>
                                 <div className="flex-shrink-0">
-                                    <a href="javascript:void(0);" className="badge bg-light text-primary fs-12"><i className="ri-edit-box-line align-bottom me-1" /> Edit</a>
+                                    <a href="" className="badge bg-light text-primary fs-12"><i className="ri-edit-box-line align-bottom me-1" /> Edit</a>
                                 </div>
                             </div>
                             <div className="progress animated-progress custom-progress progress-label">
@@ -139,7 +162,7 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
                                     <h5 className="card-title mb-0">Portfolio</h5>
                                 </div>
                                 <div className="flex-shrink-0">
-                                    <a href="javascript:void(0);" className="badge bg-light text-primary fs-12"><i className="ri-add-fill align-bottom me-1" /> Add</a>
+                                    <a href="" className="badge bg-light text-primary fs-12"><i className="ri-add-fill align-bottom me-1" /> Add</a>
                                 </div>
                             </div>
                             <div className="mb-3 d-flex">
@@ -222,63 +245,83 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
                                         <div className="row">
                                             <div className="col-lg-6">
                                                 <div className="mb-3">
-                                                    <label className="form-label">First Name <span className="text-danger">*</span></label>
-                                                    <input type="text" {...register("FirstName", { required: 'FirstName is required', })} className="form-control" placeholder="Enter first name" />
-                                                    {formErrors?.FirstName && <div className='text-danger invalid-input'>{formErrors?.FirstName.message}</div>}
+                                                    <ControllerTextInput
+                                                        name="FirstName"
+                                                        control={control}
+                                                        label="First Name"
+                                                        rules={{
+                                                            required: 'First name is required',
+                                                        }}
+                                                        placeholder="Enter first name"
+                                                    />
                                                 </div>
                                             </div>
                                             {/*end col*/}
                                             <div className="col-lg-6">
                                                 <div className="mb-3">
-                                                    <label className="form-label">Last Name <span className="text-danger">*</span></label>
-                                                    <input type="text"  {...register("LastName", { required: 'LastName is required', })} className="form-control" placeholder="Enter last name" />
-                                                    {formErrors?.LastName && <div className='text-danger invalid-input'>{formErrors?.LastName.message}</div>}
+                                                    <ControllerTextInput
+                                                        name="LastName"
+                                                        control={control}
+                                                        label="Last Name"
+                                                        rules={{
+                                                            required: 'Last name is required',
+                                                        }}
+                                                        placeholder="Enter last name"
+                                                    />
                                                 </div>
                                             </div>
                                             <div className="col-lg-6">
                                                 <div className="mb-3">
-                                                    <label className="form-label">Nick Name</label>
-                                                    <input type="text"  {...register("NickName")} className="form-control" placeholder="Enter nick name number" />
-                                                    {formErrors?.NickName && <div className='text-danger invalid-input'>{formErrors?.NickName.message}</div>}
+                                                    <ControllerTextInput
+                                                        name="NickName"
+                                                        control={control}
+                                                        label="Nick Name"
+                                                        placeholder="Enter nick name"
+                                                    />
                                                 </div>
                                             </div>
                                             <div className="col-lg-6">
                                                 <div className="mb-3">
-                                                    <label className="form-label">Phone</label>
-                                                    <input type="text"  {...register("Phone")} className="form-control" placeholder="Enter phone number" />
-                                                    {formErrors?.Phone && <div className='text-danger invalid-input'>{formErrors?.Phone.message}</div>}
+                                                    <ControllerTextInput
+                                                        name="Phone"
+                                                        control={control}
+                                                        label="Phone"
+                                                        placeholder="Enter phone number"
+                                                    />
                                                 </div>
                                             </div>
                                             {/*end col*/}
                                             <div className="col-lg-6">
                                                 <div className="mb-3">
-                                                    <label className="form-label">Email <span className="text-danger">*</span></label>
-                                                    <input
-                                                        type="text"
-                                                        {...register("Email",
-                                                            {
-                                                                required: 'Email is required',
-                                                                pattern: {
-                                                                    value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
-                                                                    message: 'Invalid email address',
-                                                                },
-                                                            })}
-                                                        className="form-control"
+                                                    <ControllerTextInput
+                                                        name="Email"
+                                                        control={control}
+                                                        label="Email"
+                                                        rules={{
+                                                            required: 'Email is required',
+                                                            pattern: {
+                                                                value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
+                                                                message: 'Invalid email address',
+                                                            },
+                                                        }}
                                                         placeholder="Enter email"
                                                     />
-                                                    {formErrors?.Email && <div className='text-danger invalid-input'>{formErrors?.Email.message}</div>}
                                                 </div>
                                             </div>
                                             <div className="col-lg-6">
                                                 <div className="mb-3">
-                                                    <label className="form-label">Gender</label>
-                                                    <select className="form-control"  {...register("Gender")} data-choices data-choices-search-false>
-                                                        <option value="">Select a gender</option>
-                                                        <option value="M">Male</option>
-                                                        <option value="F">Female</option>
-                                                        <option value="U">Unknown</option>
-                                                    </select>
-                                                    {formErrors?.Gender && <div className='text-danger invalid-input'>{formErrors?.Gender.message}</div>}
+                                                    <ControllerSelect
+                                                        name="Gender"
+                                                        control={control}
+                                                        label="Gender"
+                                                        options={
+                                                            <>
+                                                                <option value="M">Male</option>
+                                                                <option value="F">Female</option>
+                                                                <option value="U">Unknown</option>
+                                                            </>
+                                                        }
+                                                    />
                                                 </div>
                                             </div>
 
@@ -299,18 +342,28 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
                                         <div className="row">
                                             <div className="col-lg-6">
                                                 <div className="mb-3">
-                                                    <label className="form-label">User Name <span className="text-danger">*</span></label>
-                                                    <input type="text" {...register("UserName", { required: 'UserName is required', })} className="form-control" placeholder="Enter user name" />
-                                                    {formErrors?.UserName && <div className='text-danger invalid-input'>{formErrors?.UserName.message}</div>}
+                                                    <ControllerTextInput
+                                                        name="UserName"
+                                                        control={control}
+                                                        label="User Name"
+                                                        rules={{
+                                                            required: 'User name is required',
+                                                        }}
+                                                        placeholder="Enter user name"
+                                                    />
                                                 </div>
                                             </div>
                                             {/*end col*/}
                                             <div className="col-lg-6">
                                                 <div className="mb-3">
-                                                    <label className="form-label">Role <span className="text-danger">*</span></label>
-                                                    <select className="form-control"  {...register("UserRoleId", { required: 'User role is required', })} data-choices data-choices-search-false>
-                                                        <option value="">Select a role</option>
-                                                        {
+                                                    <ControllerSelect
+                                                        name="UserRoleId"
+                                                        control={control}
+                                                        label="User Role"
+                                                        rules={{
+                                                            required: 'User role is required',
+                                                        }}
+                                                        options={
                                                             usersRoles?.data.map((role: MaintenanceInterface) => {
                                                                 const { Name, Id } = role
 
@@ -319,25 +372,26 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
                                                                 )
                                                             })
                                                         }
-                                                    </select>
-                                                    {formErrors?.UserRoleId && <div className='text-danger invalid-input'>{formErrors?.UserRoleId.message}</div>}
+                                                    />
                                                 </div>
                                             </div>
                                             <div className="col-lg-6">
                                                 <div className="mb-3 form-check">
-                                                    <input className="form-check-input" type="checkbox" role="switch" defaultChecked={true} {...register("Authorized")} />
-                                                    <label className="form-check-label" htmlFor="flexRadioDefault1">
-                                                        Authorized
-                                                    </label>
+                                                    <ControllerCheckbox
+                                                        control={control}
+                                                        name="Authorized"
+                                                        label="Authorized"
+                                                    />
                                                 </div>
                                             </div>
 
                                             <div className="col-lg-6">
                                                 <div className="mb-3 form-check ">
-                                                    <input className="form-check-input" type="checkbox" role="switch" defaultChecked={true} {...register("Locked")} />
-                                                    <label className="form-check-label" htmlFor="flexRadioDefault1">
-                                                        Locked
-                                                    </label>
+                                                    <ControllerCheckbox
+                                                        control={control}
+                                                        name="Locked"
+                                                        label="Locked"
+                                                    />
                                                 </div>
                                             </div>
 
@@ -350,71 +404,71 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
                                             {/*end col*/}
 
                                             <div className="mt-4 mb-3 border-bottom pb-2">
-                                        <div className="float-end">
-                                            <a href="javascript:void(0);" className="link-primary">All Logout</a>
-                                        </div>
-                                        <h5 className="card-title">Login History</h5>
-                                    </div>
-                                    <div className="d-flex align-items-center mb-3">
-                                        <div className="flex-shrink-0 avatar-sm">
-                                            <div className="avatar-title bg-light text-primary rounded-3 fs-18">
-                                                <i className="ri-smartphone-line" />
+                                                <div className="float-end">
+                                                    <a href="" className="link-primary">All Logout</a>
+                                                </div>
+                                                <h5 className="card-title">Login History</h5>
                                             </div>
-                                        </div>
-                                        <div className="flex-grow-1 ms-3">
-                                            <h6>iPhone 12 Pro</h6>
-                                            <p className="text-muted mb-0">Los Angeles, United States - March 16 at
-                                                2:47PM</p>
-                                        </div>
-                                        <div>
-                                            <a href="javascript:void(0);">Logout</a>
-                                        </div>
-                                    </div>
-                                    <div className="d-flex align-items-center mb-3">
-                                        <div className="flex-shrink-0 avatar-sm">
-                                            <div className="avatar-title bg-light text-primary rounded-3 fs-18">
-                                                <i className="ri-tablet-line" />
+                                            <div className="d-flex align-items-center mb-3">
+                                                <div className="flex-shrink-0 avatar-sm">
+                                                    <div className="avatar-title bg-light text-primary rounded-3 fs-18">
+                                                        <i className="ri-smartphone-line" />
+                                                    </div>
+                                                </div>
+                                                <div className="flex-grow-1 ms-3">
+                                                    <h6>iPhone 12 Pro</h6>
+                                                    <p className="text-muted mb-0">Los Angeles, United States - March 16 at
+                                                        2:47PM</p>
+                                                </div>
+                                                <div>
+                                                    <a href="">Logout</a>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="flex-grow-1 ms-3">
-                                            <h6>Apple iPad Pro</h6>
-                                            <p className="text-muted mb-0">Washington, United States - November 06
-                                                at 10:43AM</p>
-                                        </div>
-                                        <div>
-                                            <a href="javascript:void(0);">Logout</a>
-                                        </div>
-                                    </div>
-                                    <div className="d-flex align-items-center mb-3">
-                                        <div className="flex-shrink-0 avatar-sm">
-                                            <div className="avatar-title bg-light text-primary rounded-3 fs-18">
-                                                <i className="ri-smartphone-line" />
+                                            <div className="d-flex align-items-center mb-3">
+                                                <div className="flex-shrink-0 avatar-sm">
+                                                    <div className="avatar-title bg-light text-primary rounded-3 fs-18">
+                                                        <i className="ri-tablet-line" />
+                                                    </div>
+                                                </div>
+                                                <div className="flex-grow-1 ms-3">
+                                                    <h6>Apple iPad Pro</h6>
+                                                    <p className="text-muted mb-0">Washington, United States - November 06
+                                                        at 10:43AM</p>
+                                                </div>
+                                                <div>
+                                                    <a href="">Logout</a>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="flex-grow-1 ms-3">
-                                            <h6>Galaxy S21 Ultra 5G</h6>
-                                            <p className="text-muted mb-0">Conneticut, United States - June 12 at
-                                                3:24PM</p>
-                                        </div>
-                                        <div>
-                                            <a href="javascript:void(0);">Logout</a>
-                                        </div>
-                                    </div>
-                                    <div className="d-flex align-items-center">
-                                        <div className="flex-shrink-0 avatar-sm">
-                                            <div className="avatar-title bg-light text-primary rounded-3 fs-18">
-                                                <i className="ri-macbook-line" />
+                                            <div className="d-flex align-items-center mb-3">
+                                                <div className="flex-shrink-0 avatar-sm">
+                                                    <div className="avatar-title bg-light text-primary rounded-3 fs-18">
+                                                        <i className="ri-smartphone-line" />
+                                                    </div>
+                                                </div>
+                                                <div className="flex-grow-1 ms-3">
+                                                    <h6>Galaxy S21 Ultra 5G</h6>
+                                                    <p className="text-muted mb-0">Conneticut, United States - June 12 at
+                                                        3:24PM</p>
+                                                </div>
+                                                <div>
+                                                    <a href="">Logout</a>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="flex-grow-1 ms-3">
-                                            <h6>Dell Inspiron 14</h6>
-                                            <p className="text-muted mb-0">Phoenix, United States - July 26 at
-                                                8:10AM</p>
-                                        </div>
-                                        <div>
-                                            <a href="javascript:void(0);">Logout</a>
-                                        </div>
-                                    </div>
+                                            <div className="d-flex align-items-center">
+                                                <div className="flex-shrink-0 avatar-sm">
+                                                    <div className="avatar-title bg-light text-primary rounded-3 fs-18">
+                                                        <i className="ri-macbook-line" />
+                                                    </div>
+                                                </div>
+                                                <div className="flex-grow-1 ms-3">
+                                                    <h6>Dell Inspiron 14</h6>
+                                                    <p className="text-muted mb-0">Phoenix, United States - July 26 at
+                                                        8:10AM</p>
+                                                </div>
+                                                <div>
+                                                    <a href="">Logout</a>
+                                                </div>
+                                            </div>
                                         </div>
                                         {/*end row*/}
                                     </form>
@@ -422,7 +476,7 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
 
                                 {/*end tab-pane*/}
                                 <div className="tab-pane" id="changePassword" role="tabpanel">
-                                    <form action="javascript:void(0);">
+                                    <form action="">
                                         <div className="row g-2">
                                             <div className="col-lg-4">
                                                 <div>
@@ -447,13 +501,7 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
                                                     <input type="password" className="form-control" id="confirmpasswordInput" placeholder="Confirm password" />
                                                 </div>
                                             </div>
-                                            {/*end col*/}
-                                            <div className="col-lg-12">
-                                                <div className="mb-3">
-                                                    <a href="javascript:void(0);" className="link-primary text-decoration-underline">Forgot
-                                                        Password ?</a>
-                                                </div>
-                                            </div>
+
                                             {/*end col*/}
                                             <div className="col-lg-12">
                                                 <div className="text-end">
@@ -589,6 +637,16 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
                                 </div>
                                 {/*end tab-pane*/}
                                 <div className="tab-pane" id="privacy" role="tabpanel">
+                                    <TwoFactorAuthConfigModal />
+                                    <ConfirmModal
+                                        mutationFn={onDisableTFA}
+                                        text={t('SureWantDisableTFA')}
+                                        confirmButtonText={t('YesDisabled')}
+                                        modalName='twoFactorAuthDisableModal'
+                                        mutationLoading={disableTFALoading}
+                                        closeButtonRef={closeButtonRef}
+                                    />
+
                                     <div className="mb-4 pb-2">
                                         <h5 className="card-title text-decoration-underline mb-3">Security:</h5>
                                         <div className="d-flex flex-column flex-sm-row mb-4 mb-sm-0">
@@ -600,8 +658,11 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
                                                     Authentication and SMS are Supported.</p>
                                             </div>
                                             <div className="flex-shrink-0 ms-sm-3">
-                                                <a href="javascript:void(0);" className="btn btn-sm btn-primary">Enable Two-facor
-                                                    Authentication</a>
+                                                {
+                                                    user?.TFAEnabled
+                                                        ? <button type="button" className="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#twoFactorAuthDisableModal">{t("DisableTFA")}</button>
+                                                        : <button type="button" className="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#twoFactorAuthConfigModal">{t("EnableTFA")}</button>
+                                                }
                                             </div>
                                         </div>
                                         <div className="d-flex flex-column flex-sm-row mb-4 mb-sm-0 mt-2">
@@ -613,7 +674,7 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
                                                     retina.</p>
                                             </div>
                                             <div className="flex-shrink-0 ms-sm-3">
-                                                <a href="javascript:void(0);" className="btn btn-sm btn-primary">Set
+                                                <a href="" className="btn btn-sm btn-primary">Set
                                                     up secondary method</a>
                                             </div>
                                         </div>
@@ -626,7 +687,7 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
                                                     generate a backup code on twitter.com.</p>
                                             </div>
                                             <div className="flex-shrink-0 ms-sm-3">
-                                                <a href="javascript:void(0);" className="btn btn-sm btn-primary">Generate backup codes</a>
+                                                <a href="" className="btn btn-sm btn-primary">Generate backup codes</a>
                                             </div>
                                         </div>
                                     </div>
@@ -690,20 +751,7 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
                                                     </div>
                                                 </div>
                                             </li>
-                                            <li className="d-flex mt-2">
-                                                <div className="flex-grow-1">
-                                                    <label className="form-check-label fs-15" htmlFor="purchaesNotification">
-                                                        Show purchase notifications
-                                                    </label>
-                                                    <p className="text-muted">Get real-time purchase alerts to
-                                                        protect yourself from fraudulent charges.</p>
-                                                </div>
-                                                <div className="flex-shrink-0">
-                                                    <div className="form-check form-switch">
-                                                        <input className="form-check-input" type="checkbox" role="switch" id="purchaesNotification" />
-                                                    </div>
-                                                </div>
-                                            </li>
+
                                         </ul>
                                     </div>
                                     <div>
@@ -717,9 +765,9 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
                                             <input type="password" className="form-control" id="passwordInput" placeholder="Enter your password" defaultValue="make@321654987" style={{ maxWidth: 265 }} />
                                         </div>
                                         <div className="hstack gap-2 mt-3">
-                                            <a href="javascript:void(0);" className="btn btn-soft-danger">Close &amp;
+                                            <a href="" className="btn btn-soft-danger">Close &amp;
                                                 Delete This Account</a>
-                                            <a href="javascript:void(0);" className="btn btn-light">Cancel</a>
+                                            <a href="" className="btn btn-light">Cancel</a>
                                         </div>
                                     </div>
                                 </div>

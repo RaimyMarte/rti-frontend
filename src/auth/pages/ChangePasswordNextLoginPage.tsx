@@ -1,5 +1,5 @@
 import { ChangePasswordPageLayout } from "../layout"
-import { isMutationSuccessResponse } from "../../helpers"
+import { isMutationSuccessResponse } from "../../utils"
 import { ChangePasswordNextLoginBody, useChangePasswordNextLoginMutation } from "../../store/api"
 import { useForm } from "react-hook-form"
 import { useState } from "react"

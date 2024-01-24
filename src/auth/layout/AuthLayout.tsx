@@ -4,7 +4,7 @@ import { Footer } from "../../ui/components"
 interface AuthLayoutProps {
     children: ReactNode;
 }
-export const AuthLayout = ({ children }:AuthLayoutProps) => {
+export const AuthLayout = ({ children }: AuthLayoutProps) => {
     return (
         <div className="auth-page-wrapper auth-bg-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
 
@@ -20,11 +20,6 @@ export const AuthLayout = ({ children }:AuthLayoutProps) => {
                                         <div className="p-lg-5 p-4 auth-one-bg h-100">
                                             <div className="bg-overlay" />
                                             <div className="position-relative h-100 d-flex flex-column">
-                                                <div className="mb-4">
-                                                    <div className="d-block">
-                                                        {/* <img src="/assets/images/logolight.png" height={108} /> */}
-                                                    </div>
-                                                </div>
                                                 <div className="mt-auto">
                                                     <div className="mb-3">
                                                         <i className="ri-double-quotes-l display-4 text-success" />

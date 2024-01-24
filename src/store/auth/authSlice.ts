@@ -1,14 +1,21 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { UserInterface, } from '../../interfaces';
 
+export interface TFAState {
+  TFAEnabled: boolean
+  userId: string | undefined
+}
+
 interface InitialState {
   status: string,
   user: UserInterface | null
+  tfaState: TFAState | null
 }
 
 const initialState: InitialState = {
-  status: "checking", //'checking', 'not-authenticated', 'authenticated'
+  status: "checking", //'checking', 'not-authenticated', 'authenticated', 'tfa'
   user: null,
+  tfaState: null
 }
 
 export const authSlice = createSlice({
@@ -18,6 +25,11 @@ export const authSlice = createSlice({
     loginState: (state, { payload }: { payload: UserInterface | null }) => {
       state.status = "authenticated";
       state.user = payload
+    },
+
+    userTFAState: (state, { payload }: { payload: TFAState | null }) => {
+      state.status = "tfa";
+      state.tfaState = payload
     },
 
     logoutState: (state) => {
@@ -32,4 +44,4 @@ export const authSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { loginState, logoutState, checkingCredentials } = authSlice.actions;
+export const { loginState, userTFAState, logoutState, checkingCredentials } = authSlice.actions;

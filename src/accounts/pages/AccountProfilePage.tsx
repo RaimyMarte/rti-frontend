@@ -1,17 +1,14 @@
-
-import { useParams } from "react-router-dom"
+// import { useParams } from "react-router-dom"
 import { MainLayout } from "../../layout"
-import { AccountDetailsTabs } from "../components"
-import { useGetAccountByIdQuery } from "../../store/api"
+import { AccountProfileTabs } from "../components"
 import { Loading } from "../../ui/components"
-export const AccountDetailsPage = () => {
-  const { id } = useParams()
-  const { data: account, isLoading: accountLoading, } = useGetAccountByIdQuery(id || '')
-  console.log(account)
+export const AccountProfilePage = () => {
+  // const { id } = useParams()
+  const loading = false
   return (
     <MainLayout>
       {
-        accountLoading
+        loading
           ? <Loading />
           : <>
             <div className="profile-foreground position-relative mx-n4 mt-n4">
@@ -34,7 +31,7 @@ export const AccountDetailsPage = () => {
                     <div className="hstack text-white-50 gap-1">
                       <div className="me-2"><i className="ri-map-pin-user-line me-1 text-white-75 fs-16 align-middle" />Miami Lakes,
                         United States</div>
-                      <div><i className="ri-building-line me-1 text-white-75 fs-16 align-middle" />Renaissance Technical Institute
+                      <div><i className="ri-building-line me-1 text-white-75 fs-16 align-middle" />RTI
                       </div>
                     </div>
                   </div>
@@ -62,7 +59,7 @@ export const AccountDetailsPage = () => {
             </div>
             <div className="row">
               <div className="col-lg-12">
-                <AccountDetailsTabs />
+                <AccountProfileTabs />
               </div>
               {/*end col*/}
             </div>

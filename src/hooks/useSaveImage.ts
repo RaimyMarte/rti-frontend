@@ -1,4 +1,4 @@
-import { isMutationSuccessResponse } from '../helpers';
+import { isMutationSuccessResponse } from '../utils';
 import { useUploadFile } from '.';
 import toast from 'react-hot-toast';
 

@@ -1,22 +1,28 @@
-import { Navigate, Route, Routes, } from "react-router-dom"
-import { ChangePasswordNextLoginPage, ForgotPasswordPage, LoginPage, ResetPasswordPage } from "../auth/pages"
-import { HomePage } from "../dashboard/pages"
-import { AccountDetailsPage, AccountFacilitiesPage, AccountsPhysicianPage } from "../accounts/pages"
-import { PrivateRoutes, PublicRoutes } from "."
-import { NotFoundPage, } from "../ui/pages"
-import { useAuthStore, useCheckAuth } from "../hooks"
-import { Loading } from "../ui/components"
-import { UsersListPage } from "../admin/users/pages"
+import { AccountProfilePage, } from "../accounts/pages"
 import { AdminUserDetailsPage, CurrentUserProfilePage, } from "../user/pages"
-import { AccountTypesListPage, UserRolesListPage } from "../maintenance/pages"
+import { ChangePasswordNextLoginPage, ForgotPasswordPage, LoginPage, ResetPasswordPage, TwoFactorAuthPage } from "../auth/pages"
+import { getMaintenancesModules } from "../maintenance/helpers"
+import { HomePage } from "../dashboard/pages"
+import { Loading } from "../ui/components"
+import { MaintenancePageLayout } from "../maintenance/pages"
+import { Navigate, Route, Routes, } from "react-router-dom"
+import { NotFoundPage, } from "../ui/pages"
+import { PrivateRoutes, PublicRoutes, } from "."
+import { useAuthStore, useCheckAuth } from "../hooks"
+import { UsersListPage } from "../admin/users/pages"
+import { TFunction } from "i18next"
 
-export const AppRouter = () => {
+export const AppRouter = ({ t }: { t: TFunction<"translation", undefined> }) => {
     const { status, user } = useAuthStore()
 
     useCheckAuth()
 
+    if (status === 'tfa') return <TwoFactorAuthPage />
     if (status === 'checking') return <Loading />
     if (user?.ChangePwdNextLogin) return <ChangePasswordNextLoginPage />
+
+
+    const maintenanceRoutes = getMaintenancesModules(t)
 
     return (
         <Routes>
@@ -24,17 +30,29 @@ export const AppRouter = () => {
                 <Route path="/" element={<Navigate to='/home' />} />
                 <Route path="/home" element={<HomePage />} />
 
-                <Route path="/accounts/facilities" element={<AccountFacilitiesPage />} />
-                <Route path="/accounts/physicians" element={<AccountsPhysicianPage />} />
-                <Route path="/accounts/details/:id" element={<AccountDetailsPage />} />
+                <Route path="/accounts/details/:id" element={<AccountProfilePage />} />
 
 
                 <Route path="/users/list" element={<UsersListPage />} />
                 <Route path="/user/profile" element={<CurrentUserProfilePage />} />
                 <Route path="/user/details/:id" element={<AdminUserDetailsPage />} />
 
-                <Route path="/AccountType/list" element={<AccountTypesListPage />} />
-                <Route path="/UserRole/list" element={<UserRolesListPage />} />
+                {
+                    maintenanceRoutes.map(({ maintenanceName, maintenanceTitle, maintenanceButtonText, link, breadcrumb, }) => (
+                        <Route key={maintenanceTitle}>
+                            <Route
+                                path={link}
+                                element={
+                                    <MaintenancePageLayout
+                                        maintenanceTitle={maintenanceTitle}
+                                        maintenanceName={maintenanceName}
+                                        maintenanceButtonText={maintenanceButtonText}
+                                        breadcrumb={breadcrumb}
+                                    />}
+                            />
+                        </Route>
+                    ))
+                }
 
                 <Route path="/*" element={<NotFoundPage />} />
             </Route>
@@ -47,8 +65,6 @@ export const AppRouter = () => {
 
                 <Route path="/*" element={<NotFoundPage />} />
             </Route>
-
-
         </Routes>
     )
 }

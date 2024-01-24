@@ -1,2 +1,1 @@
-export * from './AccountTypesListPage'
-export * from './UserRolesListPage'
+export * from './MaintenancePageLayout'

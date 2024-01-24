@@ -1,9 +1,9 @@
-import { excelHrApi } from './';
-import { getHeaders } from '../../helpers';
+import { rtiApi } from '.';
+import { getHeaders } from '../../utils';
 import { ApiResponseInterface, } from '../../interfaces';
 
 
-export const countriesApi = excelHrApi.injectEndpoints({
+export const geoApi = rtiApi.injectEndpoints({
     endpoints: (builder) => ({
 
         getCountries: builder.query<ApiResponseInterface, void>({
@@ -31,4 +31,4 @@ export const {
     useGetCountriesQuery,
     useGetStatesQuery,
     useGetCitiesQuery,
-} = countriesApi;
+} = geoApi;
