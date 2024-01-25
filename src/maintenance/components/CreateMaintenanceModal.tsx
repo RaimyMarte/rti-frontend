@@ -59,6 +59,18 @@ export const CreateMaintenanceModal = ({ maintenanceName, maintenanceButtonText 
                     <form onSubmit={handleSubmit(onFormSubmit)} className="tablelist-form">
                         <div className="modal-body">
                             <div className="row g-3">
+
+                                <div className="col-lg-6">
+                                    <TextInputComponent
+                                        name="Code"
+                                        register={register}
+                                        formErrors={formErrors}
+                                        label="Code"
+                                        placeholder="Enter code"
+                                    />
+                                </div>
+                                <div className='col-lg-6'></div>
+
                                 <div className="col-lg-6">
                                     <TextInputComponent
                                         name="Name"
@@ -74,13 +86,15 @@ export const CreateMaintenanceModal = ({ maintenanceName, maintenanceButtonText 
 
                                 <div className="col-lg-6">
                                     <TextInputComponent
-                                        name="Code"
+                                        name="NameEsp"
                                         register={register}
                                         formErrors={formErrors}
-                                        label="Code"
-                                        placeholder="Enter code"
+                                        label="Name (Español)"
+                                        placeholder="Enter name"
                                     />
                                 </div>
+
+
 
                                 <div className="col-lg-12">
                                     <TextInputComponent

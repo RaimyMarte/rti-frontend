@@ -5,7 +5,7 @@ import { useUiStore } from "../../hooks";
 export const Sidebar = () => {
     const { t } = useTranslation();
     const {
-        // accountsMenu,
+        applicationsMenu,
         // lettersMenu,
         adminMenu,
         maintenanceMenu,
@@ -53,21 +53,18 @@ export const Sidebar = () => {
                             </NavLink>
                         </li>
 
-                        {/* <li className="nav-item">
-                            <a className={`nav-link menu-link ${accountsMenu.isOpen ? '' : 'collapsed'}`} onClick={() => toggleMenu('accountsMenu')} data-bs-toggle="collapse" role="button" aria-expanded={accountsMenu.isOpen ? 'true' : 'false'}>
-                                <i className="las la-id-card" /> <span>{t('Accounts')}</span>
+                        <li className="nav-item">
+                            <a className={`nav-link menu-link ${applicationsMenu.isOpen ? '' : 'collapsed'}`} onClick={() => toggleMenu('applicationsMenu')} data-bs-toggle="collapse" role="button" aria-expanded={applicationsMenu.isOpen ? 'true' : 'false'}>
+                                <i className="las la-id-card" /> <span>{t('Applications')}</span>
                             </a>
-                            <div className={`collapse menu-dropdown ${accountsMenu.isOpen ? 'show' : ''}`}>
+                            <div className={`collapse menu-dropdown ${applicationsMenu.isOpen ? 'show' : ''}`}>
                                 <ul className="nav nav-sm flex-column">
                                     <li className="nav-item">
-                                        <NavLink to="/accounts/facilities" className="nav-link">{t('List')} </NavLink>
-                                    </li>
-                                    <li className="nav-item">
-                                        <NavLink to="/accounts/physicians" className="nav-link">{t('Reassigns')} </NavLink>
+                                        <NavLink to="/application/list" className="nav-link">{t('List')} </NavLink>
                                     </li>
                                 </ul>
                             </div>
-                        </li> */}
+                        </li>
 
                         {/* <li className="nav-item">
                             <a className={`nav-link menu-link ${managmentMenu.isOpen ? '' : 'collapsed'}`} onClick={() => toggleMenu('managmentMenu')} data-bs-toggle="collapse" role="button" aria-expanded={managmentMenu.isOpen ? 'true' : 'false'}>
@@ -168,10 +165,6 @@ export const Sidebar = () => {
                                     </li>
                                     <li className="nav-item">
                                         <NavLink to="/previous_education" className="nav-link">{t('PreviousEducation')} </NavLink>
-                                    </li>
-
-                                    <li className="nav-item">
-                                        <NavLink to="/program_interested" className="nav-link">{t('ProgramInterested')} </NavLink>
                                     </li>
                                     <li className="nav-item">
                                         <NavLink to="/race" className="nav-link">{t('Race')} </NavLink>

@@ -11,6 +11,7 @@ export interface MaintenanceBody {
     Name: string,
     Code: string,
     Description: string,
+    NameEsp: string,
     Enabled: boolean
 }
 

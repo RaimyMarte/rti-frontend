@@ -89,7 +89,7 @@ export const MaintenancePageLayout = ({ maintenanceTitle, maintenanceName, maint
                 columns={tableColumns}
                 rows={
                     maintenanceData?.data.map((maintenance: MaintenanceInterface,) => {
-                        const { Id, Name, Code, Description, CreatedDate, Enabled } = maintenance
+                        const { Id, Name, Code, CreatedDate, Enabled } = maintenance
 
                         return (
                             <tr key={Id}>
@@ -98,8 +98,8 @@ export const MaintenancePageLayout = ({ maintenanceTitle, maintenanceName, maint
                                         <input className="form-check-input" type="checkbox" name="chk_child" defaultValue="option1" />
                                     </div>
                                 </th>
-                                <td>{Name}</td>
                                 <td>{Code}</td>
+                                <td>{Name} </td>
                                 <td>
                                     {
                                         Enabled
@@ -107,8 +107,6 @@ export const MaintenancePageLayout = ({ maintenanceTitle, maintenanceName, maint
                                             : <i className="ri-close-circle-line align-middle text-danger"></i>
                                     }
                                 </td>
-                                {/* <td>{Enabled}</td> */}
-                                <td>{Description}</td>
                                 <td>{dayjs(CreatedDate).format('MM/DD/YYYY HH:mm:ss')}</td>
                                 <td>
                                     <ul className="list-inline hstack gap-2 mb-0">

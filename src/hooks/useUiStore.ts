@@ -3,7 +3,7 @@ import { onToggleMenu } from "../store/ui"
 
 export const useUiStore = () => {
     const {
-        accountsMenu,
+        applicationsMenu,
         adminMenu,
         lettersMenu,
         maintenanceMenu,
@@ -16,7 +16,7 @@ export const useUiStore = () => {
 
     return {
         //Properties
-        accountsMenu,
+        applicationsMenu,
         adminMenu,
         lettersMenu,
         maintenanceMenu,

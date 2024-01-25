@@ -2,6 +2,7 @@ export interface MaintenanceInterface {
     Id: number;
     Code: string | null;
     Name: string;
+    NameEsp: string;
     Description: string | null;
     Enabled: boolean;
     OrderBy: number | null;

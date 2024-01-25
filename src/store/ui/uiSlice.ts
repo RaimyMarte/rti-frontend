@@ -10,7 +10,7 @@ interface MainMenu {
 }
 
 interface InitialState {
-  accountsMenu: MainMenu;
+  applicationsMenu: MainMenu;
   adminMenu: MainMenu;
   lettersMenu: MainMenu;
   maintenanceMenu: MainMenu;
@@ -18,7 +18,7 @@ interface InitialState {
 }
 
 const initialState: InitialState = {
-  accountsMenu: {
+  applicationsMenu: {
     isOpen: false,
   },
   adminMenu: {

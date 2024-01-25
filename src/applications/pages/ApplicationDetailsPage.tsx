@@ -1,8 +1,8 @@
-// import { useParams } from "react-router-dom"
 import { MainLayout } from "../../layout"
-import { AccountProfileTabs } from "../components"
+
 import { Loading } from "../../ui/components"
-export const AccountProfilePage = () => {
+import { AccountProfileTabs } from "../components"
+export const ApplicationDetailsPage = () => {
   // const { id } = useParams()
   const loading = false
   return (

@@ -1,9 +1,16 @@
 import { ReactNode } from "react"
 import { Loading, PaginationComponent } from "../components"
 import { UseFormRegister } from "react-hook-form"
-import { useSearchParams } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 
+
+interface AddButtonProps {
+    label: string
+    color: string
+    modalTarget?: string
+    link?: string
+}
 interface ServerTableLayoutProps {
     register: UseFormRegister<any>
     searchPlaceholder: string
@@ -13,13 +20,21 @@ interface ServerTableLayoutProps {
         name: string
     }[]
     rows: ReactNode
-    addButtonProps: {
-        label: string
-        color: string
-        modalTarget: string
-    }
+    addButtonProps: AddButtonProps
     totalItemsCount: number
 }
+
+const AddButtonComponent = ({ addButtonProps }: { addButtonProps: AddButtonProps }) => (
+    <button
+        type="button"
+        className={`btn btn-${addButtonProps?.color} add-btn`}
+        data-bs-toggle={addButtonProps.modalTarget ? "modal" : undefined}
+        data-bs-target={addButtonProps.modalTarget ? `#${addButtonProps.modalTarget}` : undefined}
+    >
+        <i className="ri-add-line align-bottom me-1" />
+        {addButtonProps?.label}
+    </button>
+)
 
 export const TableLayout = ({ register, searchPlaceholder, loading, columns, rows, addButtonProps, totalItemsCount }: ServerTableLayoutProps) => {
     const { t } = useTranslation();
@@ -30,6 +45,8 @@ export const TableLayout = ({ register, searchPlaceholder, loading, columns, row
 
     const startItemIndex = (activePage - 1) * pageSize + 1;
     const endItemIndex = Math.min(activePage * pageSize, totalItemsCount);
+
+
 
     return (
         <div className="row">
@@ -48,7 +65,15 @@ export const TableLayout = ({ register, searchPlaceholder, loading, columns, row
                             <div className="col-sm-auto ms-auto">
                                 <div className="hstack gap-2">
                                     <button className="btn btn-danger" id="remove-actions" ><i className="ri-delete-bin-2-line" /></button>
-                                    <button type="button" className={`btn btn-${addButtonProps?.color} add-btn`} data-bs-toggle="modal" data-bs-target={`#${addButtonProps.modalTarget}`}><i className="ri-add-line align-bottom me-1" />{addButtonProps?.label}</button>
+
+                                    {
+                                        Boolean(addButtonProps?.link) ?
+                                            <Link to={addButtonProps?.link || ''} >
+                                                <AddButtonComponent addButtonProps={addButtonProps} />
+                                            </Link>
+                                            : <AddButtonComponent addButtonProps={addButtonProps} />
+                                    }
+
                                 </div>
                             </div>
                         </div>

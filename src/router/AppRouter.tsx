@@ -1,5 +1,5 @@
-import { AccountProfilePage, } from "../accounts/pages"
 import { AdminUserDetailsPage, CurrentUserProfilePage, } from "../user/pages"
+import { ApplicationDetailsPage, ApplicationListPage } from "../applications/pages"
 import { ChangePasswordNextLoginPage, ForgotPasswordPage, LoginPage, ResetPasswordPage, TwoFactorAuthPage } from "../auth/pages"
 import { getMaintenancesModules } from "../maintenance/helpers"
 import { HomePage } from "../dashboard/pages"
@@ -8,9 +8,9 @@ import { MaintenancePageLayout } from "../maintenance/pages"
 import { Navigate, Route, Routes, } from "react-router-dom"
 import { NotFoundPage, } from "../ui/pages"
 import { PrivateRoutes, PublicRoutes, } from "."
+import { TFunction } from "i18next"
 import { useAuthStore, useCheckAuth } from "../hooks"
 import { UsersListPage } from "../admin/users/pages"
-import { TFunction } from "i18next"
 
 export const AppRouter = ({ t }: { t: TFunction<"translation", undefined> }) => {
     const { status, user } = useAuthStore()
@@ -30,7 +30,8 @@ export const AppRouter = ({ t }: { t: TFunction<"translation", undefined> }) => 
                 <Route path="/" element={<Navigate to='/home' />} />
                 <Route path="/home" element={<HomePage />} />
 
-                <Route path="/accounts/details/:id" element={<AccountProfilePage />} />
+                <Route path="/application/list/" element={<ApplicationListPage />} />
+                <Route path="/application/details/:id" element={<ApplicationDetailsPage />} />
 
 
                 <Route path="/users/list" element={<UsersListPage />} />

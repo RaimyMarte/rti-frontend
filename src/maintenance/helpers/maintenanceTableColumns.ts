@@ -2,20 +2,16 @@ import { TFunction } from "i18next"
 
 export const maintenanceTableColumns = (t: TFunction<"translation", undefined>) => [
     {
-        name: 'Name',
-        label: t('Name'),
-    },
-    {
         name: 'Code',
         label: t('Code'),
     },
     {
-        name: 'Enabled',
-        label: t('Enabled'),
+        name: 'Name',
+        label: t('Name'),
     },
     {
-        name: 'Description',
-        label: t('Description'),
+        name: 'Enabled',
+        label: t('Enabled'),
     },
     {
         name: 'CreatedDate',

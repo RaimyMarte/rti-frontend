@@ -23,13 +23,6 @@ export const getMaintenancesModules = (t: TFunction<"translation", undefined>) =
         breadcrumb: t('Users'),
     },
     {
-        maintenanceName: "ProgramInterested",
-        maintenanceTitle: t('ProgramInterested'),
-        maintenanceButtonText: t('programInterestedButton'),
-        link: '/program_interested',
-        breadcrumb: t('Users'),
-    },
-    {
         maintenanceName: "Race",
         maintenanceTitle: t('Race'),
         maintenanceButtonText: t('raceButton'),

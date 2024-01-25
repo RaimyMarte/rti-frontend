@@ -22,6 +22,7 @@ export const EditMaintenanceModal = ({ activeMaintenance, maintenanceName, maint
 
     const defaultValues: MaintenanceBody = {
         Name: activeMaintenance?.Name || '',
+        NameEsp: activeMaintenance?.NameEsp || '',
         Code: activeMaintenance?.Code || '',
         Description: activeMaintenance?.Description || '',
         Enabled: activeMaintenance?.Enabled || false,
@@ -77,6 +78,17 @@ export const EditMaintenanceModal = ({ activeMaintenance, maintenanceName, maint
                             <div className="row g-3">
                                 <div className="col-lg-6">
                                     <ControllerTextInput
+                                        name="Code"
+                                        control={control}
+                                        label="Code"
+                                        placeholder="Enter code"
+                                    />
+                                </div>
+
+                                <div className='col-lg-6'></div>
+
+                                <div className="col-lg-6">
+                                    <ControllerTextInput
                                         name="Name"
                                         control={control}
                                         label="Name"
@@ -89,10 +101,10 @@ export const EditMaintenanceModal = ({ activeMaintenance, maintenanceName, maint
 
                                 <div className="col-lg-6">
                                     <ControllerTextInput
-                                        name="Code"
+                                        name="NameEsp"
                                         control={control}
-                                        label="Code"
-                                        placeholder="Enter code"
+                                        label="Name (Español)"
+                                        placeholder="Enter name"
                                     />
                                 </div>
 
