@@ -23,7 +23,7 @@ export const Sidebar = () => {
                         <img src="/assets/images/logo-xs.png" height={35} />
                     </span>
                     <span className="logo-lg">
-                        <img src="/assets/images/logo.png" height={172} />
+                        <img src="/assets/images/logo.png" height={65} />
                     </span>
                 </NavLink>
                 {/* Light Logo*/}
@@ -32,7 +32,7 @@ export const Sidebar = () => {
                         <img src="/assets/images/logo-xs.png" height={35} />
                     </span>
                     <span className="logo-lg">
-                        <img src="/assets/images/logo.png" height={172} />
+                        <img src="/assets/images/logo.png" height={65} />
                     </span>
                 </NavLink>
                 <button type="button" className="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover" id="vertical-hover">
@@ -160,34 +160,22 @@ export const Sidebar = () => {
                             </a>
                             <div className={`collapse menu-dropdown ${maintenanceMenu.isOpen ? 'show' : ''}`}>
                                 <ul className="nav nav-sm flex-column">
-                                    {/* <li className="nav-item">
-                                        <NavLink to="/account_active_carrier" className="nav-link">{t('AccountActiveCarrier')} </NavLink>
+                                    <li className="nav-item">
+                                        <NavLink to="/application_status" className="nav-link">{t('ApplicationStatus')} </NavLink>
                                     </li>
                                     <li className="nav-item">
-                                        <NavLink to="/account_admission_type" className="nav-link">{t('AccountAdmissionType')} </NavLink>
+                                        <NavLink to="/preferred_language" className="nav-link">{t('PreferredLanguage')} </NavLink>
                                     </li>
                                     <li className="nav-item">
-                                        <NavLink to="/account_excel_contract_carrier" className="nav-link">{t('AccountExcelContractCarrier')} </NavLink>
+                                        <NavLink to="/previous_education" className="nav-link">{t('PreviousEducation')} </NavLink>
                                     </li>
 
                                     <li className="nav-item">
-                                        <NavLink to="/account_facility_status" className="nav-link">{t('AccountFacilityStatus')} </NavLink>
+                                        <NavLink to="/program_interested" className="nav-link">{t('ProgramInterested')} </NavLink>
                                     </li>
                                     <li className="nav-item">
-                                        <NavLink to="/account_patient_class" className="nav-link">{t('AccountPatientClass')} </NavLink>
+                                        <NavLink to="/race" className="nav-link">{t('Race')} </NavLink>
                                     </li>
-                                    <li className="nav-item">
-                                        <NavLink to="/account_plan_contract" className="nav-link">{t('AccountPlanContract')} </NavLink>
-                                    </li>
-                                    <li className="nav-item">
-                                        <NavLink to="/account_status" className="nav-link">{t('AccountStatus')} </NavLink>
-                                    </li>
-                                    <li className="nav-item">
-                                        <NavLink to="/account_type" className="nav-link">{t('AccountType')} </NavLink>
-                                    </li>
-                                    <li className="nav-item">
-                                        <NavLink to="/account_workflow" className="nav-link">{t('AccountWorkflow')} </NavLink>
-                                    </li> */}
                                 </ul>
                             </div>
                         </li>
