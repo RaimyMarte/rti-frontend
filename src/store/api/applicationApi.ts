@@ -61,7 +61,17 @@ export const applicationApi = rtiApi.injectEndpoints({
 
         createApplication: builder.mutation<ApiResponseInterface, ApplicationBody>({
             query: (body) => ({
-                url: '/application_create_local',
+                url: '/application_create',
+                method: 'POST',
+                body,
+                headers: getHeaders(),
+            }),
+            invalidatesTags: ['applications'],
+        }),
+
+        userCreateApplication: builder.mutation<ApiResponseInterface, ApplicationBody>({
+            query: (body) => ({
+                url: '/application_user_create',
                 method: 'POST',
                 body,
                 headers: getHeaders(),
@@ -94,6 +104,7 @@ export const {
     useGetApplicationByIdQuery,
     useGetApplicationsQuery,
     useCreateApplicationMutation,
+    useUserCreateApplicationMutation,
     useUpdateApplicationMutation,
     useDeleteApplicationMutation,
 } = applicationApi;

@@ -64,7 +64,7 @@ export const Sidebar = () => {
                                         <NavLink to="/application/list" className="nav-link">{t('List')} </NavLink>
                                     </li>
                                     <li className="nav-item">
-                                        <NavLink to="/application/new" className="nav-link">{t('New')} </NavLink>
+                                        <NavLink to="/application/user_new" className="nav-link">{t('New')} </NavLink>
                                     </li>
                                 </ul>
                             </div>

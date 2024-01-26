@@ -34,6 +34,8 @@ export interface ApplicationInterface {
     CreatedDate: Date;
     LastUpdatedBy: string | null;
     LastUpdatedDate: Date | null;
+    Verified: boolean;
+    VerifiedDate: Date | null;
     ApplicationStatus: {
         Name: string
     } | null,
@@ -46,4 +48,12 @@ export interface ApplicationInterface {
     ApplicationLastUpdatedBy: {
         DisplayName: string
     } | null,
+    ApplicationAcademyProgram: {
+        Id: number;
+        AcademyProgramId: string;
+    }[];
+    ApplicationPreviousEducation: {
+        Id: number;
+        PreviousEducationId: number;
+    }[];
 }

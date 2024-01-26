@@ -4,7 +4,7 @@ import { isMutationSuccessResponse } from '../../utils';
 import { Link, useSearchParams } from 'react-router-dom';
 import { MainLayout } from '../../layout';
 import { TableLayout } from '../../ui/layout';
-import { useDebouncedSearch } from '../../hooks';
+import { useAuthStore, useDebouncedSearch } from '../../hooks';
 import { useDeleteApplicationMutation, useGetApplicationsQuery } from '../../store/api';
 import { useForm, useWatch } from 'react-hook-form';
 import { useRef, useState } from 'react';
@@ -18,6 +18,8 @@ interface SearchForm {
 
 export const ApplicationListPage = () => {
     const { t } = useTranslation();
+    const { isUserAdmin } = useAuthStore()
+
     const [activeApplication, setActiveApplication] = useState<ApplicationInterface | null>(null)
     const [deleteApplication, { isLoading: deleteApplicationLoading }] = useDeleteApplicationMutation()
 
@@ -101,12 +103,12 @@ export const ApplicationListPage = () => {
 
             <TableLayout
                 register={register}
-                searchPlaceholder={t('UsersSearchPlaceholder')}
+                searchPlaceholder={t('Search applications')}
                 loading={applicationsDataLoading}
                 columns={tableColumns}
                 rows={
                     applicationsData?.data.map((application: ApplicationInterface,) => {
-                        const { Id, FullName,Age, EmailAddress, PhoneNumber, CreatedDate, } = application
+                        const { Id, FullName, Age, EmailAddress, PhoneNumber, CreatedDate, } = application
 
                         return (
                             <tr key={Id}>
@@ -128,7 +130,7 @@ export const ApplicationListPage = () => {
                                             </Link>
                                         </li>
 
-                                        <li className="list-inline-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title={t("Remove")}>
+                                        <li className="list-inline-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title={t("Remove")} style={{ display: isUserAdmin ? '' : 'none' }}>
                                             <a className="text-danger d-inline-block remove-item-btn" data-bs-toggle="modal" href="#deleteApplicationModal" onClick={() => setActiveApplication(application)}>
                                                 <i className="ri-delete-bin-5-fill fs-16" />
                                             </a>
@@ -142,7 +144,7 @@ export const ApplicationListPage = () => {
                 addButtonProps={{
                     label: t('AddApplication'),
                     color: 'info',
-                    link: '/application/new',
+                    link: '/application/user_new',
                 }}
                 totalItemsCount={applicationsData?.total || 0}
             />

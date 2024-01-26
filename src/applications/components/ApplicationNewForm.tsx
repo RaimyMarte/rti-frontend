@@ -1,4 +1,4 @@
-import { ApplicationBody, useCreateApplicationMutation, useGetSelectedMaintenancesQuery } from "../../store/api";
+import { ApplicationBody, useGetSelectedMaintenancesQuery } from "../../store/api";
 import { CheckboxComponent, SelectComponent, TextAreaInputComponent, TextInputComponent } from "../../ui/components/form";
 import { isMutationSuccessResponse } from "../../utils";
 import { Loading } from "../../ui/components";
@@ -9,16 +9,17 @@ import toast from "react-hot-toast";
 
 
 const selectedMaintenances: string[] = [
+    'AcademyProgram',
     'ApplicationStatus',
     'HowDidYouHearAboutUs',
     'PreferredLanguage',
+    'PreviousEducation',
 ];
 
-export const ApplicationNewForm = () => {
+export const ApplicationNewForm = ({ createApplication }: { createApplication: any }) => {
     const { t } = useTranslation()
 
     const { data: maintenancesData, isLoading: maintenancesDataLoading } = useGetSelectedMaintenancesQuery({ selectedMaintenances, Lang: '' })
-    const [createApplication, { isLoading: createApplicationLoading }] = useCreateApplicationMutation()
 
     const {
         handleSubmit,
@@ -34,7 +35,6 @@ export const ApplicationNewForm = () => {
     const isDataLoading = maintenancesDataLoading
 
     const onFormSubmit = async (data: ApplicationBody) => {
-
         try {
             const response = await createApplication({ ...data });
             if (isMutationSuccessResponse(response)) {
@@ -59,7 +59,6 @@ export const ApplicationNewForm = () => {
             :
             <form onSubmit={handleSubmit(onFormSubmit)} className="tablelist-form">
                 <div className="row">
-                    {createApplicationLoading ? <Loading /> : null}
                     <div className="col-lg-6">
                         <h5 className="card-title mb-3">{t('Information')}</h5>
                         <div className="row">
@@ -71,6 +70,9 @@ export const ApplicationNewForm = () => {
                                         formErrors={formErrors}
                                         label={t('FirstName')}
                                         placeholder={`${t('Enter')} ${t('FirstName')}`}
+                                        rules={{
+                                            required: `'${t('FirstName')} ${t('is required')}'`,
+                                        }}
                                     />
                                 </div>
                             </div>
@@ -93,6 +95,9 @@ export const ApplicationNewForm = () => {
                                         formErrors={formErrors}
                                         label={t('LastName')}
                                         placeholder={`${t('Enter')} ${t('LastName')}`}
+                                        rules={{
+                                            required: `'${t('LastName')} ${t('is required')}'`,
+                                        }}
                                     />
                                 </div>
                             </div>
@@ -147,6 +152,9 @@ export const ApplicationNewForm = () => {
                                         formErrors={formErrors}
                                         label={t('Address')}
                                         placeholder={`${t('Enter')} ${t('Address')}`}
+                                        rules={{
+                                            required: `'${t('Address')} ${t('is required')}'`,
+                                        }}
                                     />
                                     <TextInputComponent
                                         name="AddressLine2"
@@ -196,30 +204,24 @@ export const ApplicationNewForm = () => {
                                 </div>
                             </div>
 
-                            {/* <div className="col-lg-12">
-                                <div className="mb-3 form-check">
-                                    <CheckboxComponent
-                                        register={register}
-                                        name="OrientationTalk"
-                                        label={t('Orientation Talk')}
-                                    />
-                                </div>
-                            </div>
+                            <h5 className="card-title mb-3 mt-3">{t('Previous Education')}</h5>
+                            {
+                                maintenancesData?.data?.PreviousEducation.map((maintenance: MaintenanceInterface) => {
+                                    const { SelectTitle, Id } = maintenance
 
-                            <div className="col-lg-6">
-                                <div className="mb-3">
-                                    <TextInputComponent
-                                        name="OrientationTalkDate"
-                                        register={register}
-                                        formErrors={formErrors}
-                                        label={t('Orientation Talk Date')}
-                                        placeholder={`${t('Enter')} ${t('Orientation Talk Date')}`}
-                                        type='date'
-                                    />
-                                </div>
-                            </div> */}
-
-                            {/*end col*/}
+                                    return (
+                                        <div key={Id} className="col-lg-6">
+                                            <div className="mb-3 form-check">
+                                                <CheckboxComponent
+                                                    register={register}
+                                                    name={`PreviousEducation-${Id}`}
+                                                    label={SelectTitle || ''}
+                                                />
+                                            </div>
+                                        </div>
+                                    )
+                                })
+                            }
                         </div>
                         {/*end row*/}
                     </div>
@@ -231,7 +233,7 @@ export const ApplicationNewForm = () => {
                             <div className="col-lg-12">
                                 <div className="mb-3">
                                     <SelectComponent
-                                        name="PreferredLanguage"
+                                        name="PreferredLanguageId"
                                         register={register}
                                         formErrors={formErrors}
                                         label={t('PreferredLanguage')}
@@ -328,10 +330,6 @@ export const ApplicationNewForm = () => {
                                 </div>
                             }
 
-
-
-
-
                             <div className="col-lg-12">
                                 <div className="mb-3">
                                     <TextAreaInputComponent
@@ -344,8 +342,31 @@ export const ApplicationNewForm = () => {
                                 </div>
                             </div>
 
+                            <h5 className="card-title mb-3 mt-3">{t('Which Program are you interested in?')}</h5>
+                            <div className="col-lg-12 border mb-3">
+                                <div className="row mt-3">
+                                    {
+                                        maintenancesData?.data?.AcademyProgram.map((maintenance: MaintenanceInterface) => {
+                                            const { SelectTitle, Id } = maintenance
+
+                                            return (
+                                                <div key={Id} className="col-lg-6">
+                                                    <div className="mb-3 form-check">
+                                                        <CheckboxComponent
+                                                            register={register}
+                                                            name={`AcademyProgram-${Id}`}
+                                                            label={SelectTitle || ''}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
+                            </div>
+
                             <div className="col-lg-12">
-                                <div className="hstack gap-2 justify-content-end">
+                                <div className="hstack gap-2 justify-content-end mt-auto">
                                     <button type="submit" className="btn btn-primary">{t('Create')}</button>
                                     <button type="button" className="btn btn-soft-success">{t('Cancel')}</button>
                                 </div>

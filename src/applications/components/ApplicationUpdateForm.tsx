@@ -1,18 +1,20 @@
 import { ApplicationBody, useUpdateApplicationMutation, useGetSelectedMaintenancesQuery } from "../../store/api";
+import { ApplicationInterface, MaintenanceInterface } from "../../interfaces";
 import { ControllerCheckbox, ControllerTextInput, ControllerSelect, ControllerTextAreaInput, } from "../../ui/components/form";
 import { isMutationSuccessResponse } from "../../utils";
 import { Loading } from "../../ui/components";
-import { ApplicationInterface, MaintenanceInterface } from "../../interfaces";
+import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
-import { useEffect } from "react";
 
 
 const selectedMaintenances: string[] = [
+    'AcademyProgram',
     'ApplicationStatus',
     'HowDidYouHearAboutUs',
     'PreferredLanguage',
+    'PreviousEducation',
 ];
 
 interface ApplicationUpdateFormProps {
@@ -24,7 +26,6 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
 
     const { data: maintenancesData, isLoading: maintenancesDataLoading } = useGetSelectedMaintenancesQuery({ selectedMaintenances, Lang: '' })
     const [updateApplication, { isLoading: updateApplicationLoading }] = useUpdateApplicationMutation()
-
 
     const defaultValues: ApplicationBody = {
         FirstName: applicationData?.FirstName,
@@ -52,7 +53,31 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
         handleSubmit,
         control,
         reset,
+        // setValue
     } = useForm<ApplicationBody>({ defaultValues });
+
+
+    // useEffect(() => {
+    //     const defaultPreviousEducation: { [key: string]: boolean } = {};
+    //     if (!maintenancesDataLoading && maintenancesData?.data) {
+    //         const previousEducationFields = maintenancesData?.data?.PreviousEducation?.map(({ Id }: { Id: string }) => `PreviousEducation-${Id}`);
+
+    //         // Populate defaultPreviousEducation with default values
+    //         previousEducationFields?.forEach(field => {
+    //             defaultPreviousEducation[field] = false;
+    //         });
+    //         console.log(previousEducationFields)
+    //         applicationData?.ApplicationPreviousEducation?.forEach(({ Id }) => {
+    //             const key = `PreviousEducation-${Id}`;
+    //             if (key in defaultPreviousEducation) {
+    //                 defaultPreviousEducation[key] = true;
+    //                 // setValue(defaultPreviousEducation[key],fale)
+    //             }
+    //         });
+    //     }
+    // }, [maintenancesDataLoading, maintenancesData])
+
+
 
     const AttendingAnySchools = useWatch({ control, name: 'AttendingAnySchools' })
     const HowDidYouHearAboutUsId = useWatch({ control, name: 'HowDidYouHearAboutUsId' })
@@ -60,11 +85,11 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
     const isDataLoading = maintenancesDataLoading
 
     const onFormSubmit = async (data: ApplicationBody) => {
-
+        console.log(data)
         try {
             const response = await updateApplication({ body: data, id: applicationData?.Id });
             if (isMutationSuccessResponse(response)) {
-                console.log(response)
+
                 const { data: respData } = response
 
                 if (!respData?.isSuccess) {
@@ -87,8 +112,7 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
     return (
         isDataLoading
             ? <Loading />
-            :
-            <form onSubmit={handleSubmit(onFormSubmit)} className="tablelist-form">
+            : <form onSubmit={handleSubmit(onFormSubmit)} className="tablelist-form">
                 <div className="row">
                     {updateApplicationLoading ? <Loading /> : null}
                     <div className="col-lg-6">
@@ -101,6 +125,9 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
                                         control={control}
                                         label={t('FirstName')}
                                         placeholder={`${t('Enter')} ${t('FirstName')}`}
+                                        rules={{
+                                            required: `'${t('FirstName')} ${t('is required')}'`,
+                                        }}
                                     />
                                 </div>
                             </div>
@@ -121,6 +148,9 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
                                         control={control}
                                         label={t('LastName')}
                                         placeholder={`${t('Enter')} ${t('LastName')}`}
+                                        rules={{
+                                            required: `'${t('LastName')} ${t('is required')}'`,
+                                        }}
                                     />
                                 </div>
                             </div>
@@ -216,29 +246,24 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
                                 </div>
                             </div>
 
-                            {/* <div className="col-lg-12">
-                                <div className="mb-3 form-check">
-                                    <ControllerCheckbox
-                                       control={control}
-                                        name="OrientationTalk"
-                                        label={t('Orientation Talk')}
-                                    />
-                                </div>
-                            </div>
+                            <h5 className="card-title mb-3 mt-3">{t('Previous Education')}</h5>
+                            {
+                                maintenancesData?.data?.PreviousEducation.map((maintenance: MaintenanceInterface) => {
+                                    const { SelectTitle, Id } = maintenance
 
-                            <div className="col-lg-6">
-                                <div className="mb-3">
-                                    <ControllerTextInput
-                                        name="OrientationTalkDate"
-                                       control={control}
-                                                                            label={t('Orientation Talk Date')}
-                                        placeholder={`${t('Enter')} ${t('Orientation Talk Date')}`}
-                                        type='date'
-                                    />
-                                </div>
-                            </div> */}
-
-                            {/*end col*/}
+                                    return (
+                                        <div key={Id} className="col-lg-6">
+                                            <div className="mb-3 form-check">
+                                                <ControllerCheckbox
+                                                    control={control}
+                                                    name={`PreviousEducation-${Id}`}
+                                                    label={SelectTitle || ''}
+                                                />
+                                            </div>
+                                        </div>
+                                    )
+                                })
+                            }
                         </div>
                         {/*end row*/}
                     </div>
@@ -343,10 +368,6 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
                                 </div>
                             }
 
-
-
-
-
                             <div className="col-lg-12">
                                 <div className="mb-3">
                                     <ControllerTextAreaInput
@@ -358,8 +379,31 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
                                 </div>
                             </div>
 
+                            <h5 className="card-title mb-3 mt-3">{t('Which Program are you interested in?')}</h5>
+                            <div className="col-lg-12 border mb-3">
+                                <div className="row mt-3">
+                                    {
+                                        maintenancesData?.data?.AcademyProgram.map((maintenance: MaintenanceInterface) => {
+                                            const { SelectTitle, Id } = maintenance
+
+                                            return (
+                                                <div key={Id} className="col-lg-6">
+                                                    <div className="mb-3 form-check">
+                                                        <ControllerCheckbox
+                                                            control={control}
+                                                            name={`AcademyProgram-${Id}`}
+                                                            label={SelectTitle || ''}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
+                            </div>
+
                             <div className="col-lg-12">
-                                <div className="hstack gap-2 justify-content-end">
+                                <div className="hstack gap-2 justify-content-end mt-auto">
                                     <button type="submit" className="btn btn-primary">{t('Update')}</button>
                                     <button type="button" className="btn btn-soft-success">{t('Cancel')}</button>
                                 </div>

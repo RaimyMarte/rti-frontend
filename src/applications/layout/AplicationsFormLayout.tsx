@@ -26,15 +26,9 @@ export const AplicationsFormLayout = ({ children, breadcrumb }: AplicationsFormL
                     </div>
                 </div>
             </div>
-            <div className="row">
-                <div className="col-xxl-12">
-                    <div className="card">
-                        <div className="card-body">
-                            {children}
-                        </div>
-                    </div>
-                </div>
-            </div>
+
+            {children}
+
         </MainLayout >
     )
 }
