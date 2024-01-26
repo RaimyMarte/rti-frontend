@@ -26,7 +26,7 @@ export const AppRouter = ({ t }: { t: TFunction<"translation", undefined> }) => 
 
     return (
         <Routes>
-            <Route path="/application/new" element={<ApplicationNewPage />} />
+            <Route path="/apply_now" element={<ApplicationNewPage />} />
             <Route element={<PrivateRoutes status={status} />} >
                 <Route path="/" element={<Navigate to='/home' />} />
                 <Route path="/home" element={<HomePage />} />
