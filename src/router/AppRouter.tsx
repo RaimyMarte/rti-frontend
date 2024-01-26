@@ -7,13 +7,13 @@ import { Loading } from "../ui/components"
 import { MaintenancePageLayout } from "../maintenance/pages"
 import { Navigate, Route, Routes, } from "react-router-dom"
 import { NotFoundPage, } from "../ui/pages"
-import { PrivateRoutes, PublicRoutes, } from "."
+import { AdminRoutes, PrivateRoutes, PublicRoutes, } from "."
 import { TFunction } from "i18next"
 import { useAuthStore, useCheckAuth } from "../hooks"
 import { UsersListPage } from "../admin/users/pages"
 
 export const AppRouter = ({ t }: { t: TFunction<"translation", undefined> }) => {
-    const { status, user } = useAuthStore()
+    const { status, user, isUserAdmin } = useAuthStore()
 
     useCheckAuth()
 
@@ -34,27 +34,29 @@ export const AppRouter = ({ t }: { t: TFunction<"translation", undefined> }) => 
                 <Route path="/application/new/" element={<ApplicationNewPage />} />
                 <Route path="/application/details/:id" element={<ApplicationDetailsPage />} />
 
-
-                <Route path="/users/list" element={<UsersListPage />} />
                 <Route path="/user/profile" element={<CurrentUserProfilePage />} />
-                <Route path="/user/details/:id" element={<AdminUserDetailsPage />} />
 
-                {
-                    maintenanceRoutes.map(({ maintenanceName, maintenanceTitle, maintenanceButtonText, link, breadcrumb, }) => (
-                        <Route key={maintenanceTitle}>
-                            <Route
-                                path={link}
-                                element={
-                                    <MaintenancePageLayout
-                                        maintenanceTitle={maintenanceTitle}
-                                        maintenanceName={maintenanceName}
-                                        maintenanceButtonText={maintenanceButtonText}
-                                        breadcrumb={breadcrumb}
-                                    />}
-                            />
-                        </Route>
-                    ))
-                }
+                <Route element={<AdminRoutes isUserAdmin={isUserAdmin} />} >
+                    <Route path="/users/list" element={<UsersListPage />} />
+                    <Route path="/user/details/:id" element={<AdminUserDetailsPage />} />
+
+                    {
+                        maintenanceRoutes.map(({ maintenanceName, maintenanceTitle, maintenanceButtonText, link, breadcrumb, }) => (
+                            <Route key={maintenanceTitle}>
+                                <Route
+                                    path={link}
+                                    element={
+                                        <MaintenancePageLayout
+                                            maintenanceTitle={maintenanceTitle}
+                                            maintenanceName={maintenanceName}
+                                            maintenanceButtonText={maintenanceButtonText}
+                                            breadcrumb={breadcrumb}
+                                        />}
+                                />
+                            </Route>
+                        ))
+                    }
+                </Route>
 
                 <Route path="/*" element={<NotFoundPage />} />
             </Route>

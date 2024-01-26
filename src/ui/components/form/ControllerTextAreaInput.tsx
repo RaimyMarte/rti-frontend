@@ -11,9 +11,10 @@ interface ControllerTextAreaInputProps {
     >
     placeholder?: string
     rows?: number
+    disabled?: boolean
 }
 
-export const ControllerTextAreaInput = ({ className = '', name, control, rules, rows = 3, placeholder, label, }: ControllerTextAreaInputProps) => {
+export const ControllerTextAreaInput = ({ className = '', disabled = false, name, control, rules, rows = 3, placeholder, label, }: ControllerTextAreaInputProps) => {
     const required = Object.keys(rules || {}).includes('required');
 
     return (
@@ -24,6 +25,7 @@ export const ControllerTextAreaInput = ({ className = '', name, control, rules, 
                 name={name}
                 control={control}
                 rules={rules}
+                disabled={disabled}
                 render={({ field, fieldState: { error } }) => (
                     <>
                         <textarea rows={rows} {...field} className={`form-control ${className}`} placeholder={placeholder} />

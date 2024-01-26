@@ -1,14 +1,14 @@
+import { ConfirmModal, Loading } from "../../ui/components"
 import { ControllerCheckbox, ControllerSelect, ControllerTextInput } from "../../ui/components/form"
 import { isMutationSuccessResponse } from "../../utils"
-import { ConfirmModal, Loading } from "../../ui/components"
 import { MaintenanceInterface, UserInterface } from "../../interfaces"
-import { UpdateUserBody, useDisableTFAMutation, useGetMaintenanceQuery, useUpdateUserMutation, useUploadUserPictureMutation } from "../../store/api"
-import { useForm } from "react-hook-form"
-import { useSaveImage } from "../../hooks"
-import toast from "react-hot-toast"
-import { useTranslation } from "react-i18next"
 import { TwoFactorAuthConfigModal } from "../components"
+import { UpdateUserBody, useDisableTFAMutation, useGetSelectedMaintenancesQuery, useUpdateUserMutation, useUploadUserPictureMutation } from "../../store/api"
+import { useForm } from "react-hook-form"
 import { useRef } from "react"
+import { useAuthStore, useSaveImage } from "../../hooks"
+import { useTranslation } from "react-i18next"
+import toast from "react-hot-toast"
 
 interface UserProfilePageLayoutProps {
     user: UserInterface
@@ -16,12 +16,19 @@ interface UserProfilePageLayoutProps {
 
 const usersPublicUrl: string = `${import.meta.env.VITE_API_PUBLIC_URL}/users`
 
+const selectedMaintenances: string[] = [
+    'UserRole',
+];
+
+
 export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
+    const { isUserAdmin } = useAuthStore()
     const { Id, Picture, UserProfile, Phone, Email, UserName, UserRoleId, Authorized, Locked } = user
 
     const { t } = useTranslation()
 
-    const { data: usersRoles, isLoading: usersRolesLoading, } = useGetMaintenanceQuery('UserRole')
+    const { data: maintenancesData, isLoading: maintenancesDataLoading } = useGetSelectedMaintenancesQuery({ selectedMaintenances, Lang: '' })
+
     const [uploadUserPicture, { isLoading: isUploadUserPictureLoading }] = useUploadUserPictureMutation()
 
     const { onSaveImage, fileInputRef, imagePreview, onFileInputChange, } = useSaveImage({ uploadApiFn: uploadUserPicture, elementId: user?.Id || '' })
@@ -90,7 +97,7 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
 
     return (
         <div>
-            {isUploadUserPictureLoading || updateUserLoading || usersRolesLoading ? <Loading /> : null}
+            {isUploadUserPictureLoading || updateUserLoading || maintenancesDataLoading ? <Loading /> : null}
             <div className="position-relative mx-n4 mt-n4">
                 <div className="profile-wid-bg profile-setting-img">
                     <img src="/assets/images/profile-bg.jpg" className="profile-wid-img" />
@@ -359,12 +366,13 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
                                                     <ControllerSelect
                                                         name="UserRoleId"
                                                         control={control}
+                                                        disabled={!isUserAdmin}
                                                         label="User Role"
                                                         rules={{
                                                             required: 'User role is required',
                                                         }}
                                                         options={
-                                                            usersRoles?.data.map((role: MaintenanceInterface) => {
+                                                            maintenancesData?.data?.UserRole.map((role: MaintenanceInterface) => {
                                                                 const { Name, Id } = role
 
                                                                 return (
@@ -381,6 +389,7 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
                                                         control={control}
                                                         name="Authorized"
                                                         label="Authorized"
+                                                        disabled={!isUserAdmin}
                                                     />
                                                 </div>
                                             </div>
@@ -391,6 +400,7 @@ export const UserProfilePageLayout = ({ user }: UserProfilePageLayoutProps) => {
                                                         control={control}
                                                         name="Locked"
                                                         label="Locked"
+                                                        disabled={!isUserAdmin}
                                                     />
                                                 </div>
                                             </div>

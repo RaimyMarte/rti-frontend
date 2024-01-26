@@ -12,8 +12,9 @@ interface TextAreaInputComponentProps {
         "maxLength" | "minLength" | "validate" | "required" | "pattern"
     >
     placeholder?: string
+    disabled?: boolean
 }
-export const TextAreaInputComponent = ({ className = '', rows = 3, name, register, rules, formErrors, placeholder, label, }: TextAreaInputComponentProps) => {
+export const TextAreaInputComponent = ({ className = '', disabled = false, rows = 3, name, register, rules, formErrors, placeholder, label, }: TextAreaInputComponentProps) => {
     const required = Object.keys(rules || {}).includes('required');
 
     return (
@@ -24,6 +25,7 @@ export const TextAreaInputComponent = ({ className = '', rows = 3, name, registe
                 {...register(name, rules)}
                 className={`form-control ${className}`}
                 rows={rows}
+                disabled={disabled}
                 placeholder={placeholder}
             />
 

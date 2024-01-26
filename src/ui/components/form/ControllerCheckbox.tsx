@@ -4,9 +4,10 @@ interface ControllerSelectProps {
     name: string;
     control: Control<any, any>;
     label: string;
+    disabled?: boolean
 }
 
-export const ControllerCheckbox = ({ name, control, label, }: ControllerSelectProps) => {
+export const ControllerCheckbox = ({ name, control, disabled = false, label, }: ControllerSelectProps) => {
 
     return (
         <>
@@ -15,7 +16,14 @@ export const ControllerCheckbox = ({ name, control, label, }: ControllerSelectPr
                 control={control}
                 render={({ field, fieldState: { error } }) => (
                     <>
-                        <input {...field} className="form-check-input" type="checkbox" role="switch" checked={field.value} />
+                        <input
+                            {...field}
+                            disabled={disabled}
+                            className="form-check-input"
+                            type="checkbox"
+                            role="switch"
+                            checked={field.value}
+                        />
 
                         {error && <div className='text-danger invalid-input'>{error?.message}</div>}
                     </>

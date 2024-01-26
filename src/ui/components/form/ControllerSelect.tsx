@@ -6,13 +6,14 @@ interface ControllerSelectProps {
     control: Control<any, any>;
     label: string;
     options: ReactNode;
+    disabled?: boolean
     rules?: Pick<
         RegisterOptions,
         "required"
     >
 }
 
-export const ControllerSelect = ({ name, control, rules, label, options }: ControllerSelectProps) => {
+export const ControllerSelect = ({ name, disabled = false, control, rules, label, options }: ControllerSelectProps) => {
     const required = Object.keys(rules || {}).includes('required');
 
     return (
@@ -23,9 +24,16 @@ export const ControllerSelect = ({ name, control, rules, label, options }: Contr
                 name={name}
                 control={control}
                 rules={rules}
+
                 render={({ field, fieldState: { error } }) => (
                     <>
-                        <select className="form-select" {...field} data-choices data-choices-search-false>
+                        <select
+                            className="form-select"
+                            {...field}
+                            disabled={disabled}
+                            data-choices
+                            data-choices-search-false
+                        >
                             <option value="">Select {label}</option>
                             {options}
                         </select>

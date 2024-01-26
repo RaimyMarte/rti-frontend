@@ -1,9 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom"
-import { useUiStore } from "../../hooks";
+import { useAuthStore, useUiStore } from "../../hooks";
 
 export const Sidebar = () => {
     const { t } = useTranslation();
+    const { isUserAdmin } = useAuthStore()
     const {
         applicationsMenu,
         // lettersMenu,
@@ -137,53 +138,59 @@ export const Sidebar = () => {
                             </NavLink>
                         </li> */}
 
-                        <li className="menu-title"><i className="ri-more-fill" /> <span>{t('Admin')}</span></li>
-                        <li className="nav-item">
-                            <a className={`nav-link menu-link ${adminMenu.isOpen ? '' : 'collapsed'}`} onClick={() => toggleMenu('adminMenu')} data-bs-toggle="collapse" role="button" aria-expanded={adminMenu.isOpen ? 'true' : 'false'}>
-                                <i className="lar la-user-circle" /> <span>{t('Users')}</span>
-                            </a>
-                            <div className={`collapse menu-dropdown ${adminMenu.isOpen ? 'show' : ''}`}>
-                                <ul className="nav nav-sm flex-column">
+                        {
+                            isUserAdmin && (
+                                <>
+                                    <li className="menu-title"><i className="ri-more-fill" /> <span>{t('Admin')}</span></li>
                                     <li className="nav-item">
-                                        <NavLink to="/users/list" className="nav-link">{t('Users')} </NavLink>
+                                        <a className={`nav-link menu-link ${adminMenu.isOpen ? '' : 'collapsed'}`} onClick={() => toggleMenu('adminMenu')} data-bs-toggle="collapse" role="button" aria-expanded={adminMenu.isOpen ? 'true' : 'false'}>
+                                            <i className="lar la-user-circle" /> <span>{t('Users')}</span>
+                                        </a>
+                                        <div className={`collapse menu-dropdown ${adminMenu.isOpen ? 'show' : ''}`}>
+                                            <ul className="nav nav-sm flex-column">
+                                                <li className="nav-item">
+                                                    <NavLink to="/users/list" className="nav-link">{t('Users')} </NavLink>
+                                                </li>
+                                                <li className="nav-item">
+                                                    <NavLink to="/user_role" className="nav-link">{t('UserRole')} </NavLink>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </li>
-                                    <li className="nav-item">
-                                        <NavLink to="/user_role" className="nav-link">{t('UserRole')} </NavLink>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
 
-                        <li className="nav-item">
-                            <a className={`nav-link menu-link ${maintenanceMenu.isOpen ? '' : 'collapsed'}`} onClick={() => toggleMenu('maintenanceMenu')} data-bs-toggle="collapse" role="button" aria-expanded={maintenanceMenu.isOpen ? 'true' : 'false'}>
-                                <i className="las la-pager" /> <span data-key="t-maintenances">{t('Maintenance')}</span>
-                            </a>
-                            <div className={`collapse menu-dropdown ${maintenanceMenu.isOpen ? 'show' : ''}`}>
-                                <ul className="nav nav-sm flex-column">
                                     <li className="nav-item">
-                                        <NavLink to="/application_status" className="nav-link">{t('ApplicationStatus')} </NavLink>
+                                        <a className={`nav-link menu-link ${maintenanceMenu.isOpen ? '' : 'collapsed'}`} onClick={() => toggleMenu('maintenanceMenu')} data-bs-toggle="collapse" role="button" aria-expanded={maintenanceMenu.isOpen ? 'true' : 'false'}>
+                                            <i className="las la-pager" /> <span data-key="t-maintenances">{t('Maintenance')}</span>
+                                        </a>
+                                        <div className={`collapse menu-dropdown ${maintenanceMenu.isOpen ? 'show' : ''}`}>
+                                            <ul className="nav nav-sm flex-column">
+                                                <li className="nav-item">
+                                                    <NavLink to="/application_status" className="nav-link">{t('ApplicationStatus')} </NavLink>
+                                                </li>
+                                                <li className="nav-item">
+                                                    <NavLink to="/how_did_you_hear_about_us" className="nav-link">{t('HowDidYouHearAboutUs')} </NavLink>
+                                                </li>
+                                                <li className="nav-item">
+                                                    <NavLink to="/preferred_language" className="nav-link">{t('PreferredLanguage')} </NavLink>
+                                                </li>
+                                                <li className="nav-item">
+                                                    <NavLink to="/previous_education" className="nav-link">{t('PreviousEducation')} </NavLink>
+                                                </li>
+                                                <li className="nav-item">
+                                                    <NavLink to="/race" className="nav-link">{t('Race')} </NavLink>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </li>
-                                    <li className="nav-item">
-                                        <NavLink to="/how_did_you_hear_about_us" className="nav-link">{t('HowDidYouHearAboutUs')} </NavLink>
-                                    </li>
-                                    <li className="nav-item">
-                                        <NavLink to="/preferred_language" className="nav-link">{t('PreferredLanguage')} </NavLink>
-                                    </li>
-                                    <li className="nav-item">
-                                        <NavLink to="/previous_education" className="nav-link">{t('PreviousEducation')} </NavLink>
-                                    </li>
-                                    <li className="nav-item">
-                                        <NavLink to="/race" className="nav-link">{t('Race')} </NavLink>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
 
-                        <li className="nav-item">
-                            <NavLink to="/setting" className="nav-link menu-link">
-                                <i className="las la-cog" /> <span>{t('Settings')}</span>
-                            </NavLink>
-                        </li>
+                                    <li className="nav-item">
+                                        <NavLink to="/setting" className="nav-link menu-link">
+                                            <i className="las la-cog" /> <span>{t('Settings')}</span>
+                                        </NavLink>
+                                    </li>
+                                </>
+                            )
+                        }
                     </ul>
 
                     {/* Sidebar */}

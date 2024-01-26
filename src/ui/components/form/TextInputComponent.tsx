@@ -12,8 +12,9 @@ interface TextInputComponentProps {
   >
   placeholder?: string
   type?: string
+  disabled?: boolean
 }
-export const TextInputComponent = ({ className = '', name, register, rules, formErrors, type = 'text', placeholder, label, }: TextInputComponentProps) => {
+export const TextInputComponent = ({ className = '', disabled = false, name, register, rules, formErrors, type = 'text', placeholder, label, }: TextInputComponentProps) => {
   const required = Object.keys(rules || {}).includes('required');
 
   return (
@@ -22,6 +23,7 @@ export const TextInputComponent = ({ className = '', name, register, rules, form
 
       <input
         type={type}
+        disabled={disabled}
         {...register(name, rules)}
         className={`form-control ${className}`}
         placeholder={placeholder}

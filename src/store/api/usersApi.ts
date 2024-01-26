@@ -103,7 +103,7 @@ export const usersApi = rtiApi.injectEndpoints({
                 body,
                 headers: getHeaders(),
             }),
-            invalidatesTags: ['logUser'],
+            invalidatesTags: ['users'],
         }),
 
         uploadUserPicture: builder.mutation<ApiResponseInterface, UploadData>({
@@ -113,7 +113,7 @@ export const usersApi = rtiApi.injectEndpoints({
                 body: formData,
                 headers: getHeadersWithoutContentType(),
             }),
-            invalidatesTags: ['logUser', 'users'],
+            invalidatesTags: ['users'],
         }),
     }),
 });

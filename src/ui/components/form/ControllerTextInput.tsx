@@ -11,9 +11,10 @@ interface ControllerTextInputProps {
     >
     placeholder?: string
     type?: string
+    disabled?: boolean
 }
 
-export const ControllerTextInput = ({ className = '', name, control, rules, type = 'text', placeholder, label, }: ControllerTextInputProps) => {
+export const ControllerTextInput = ({ className = '', name, disabled = false, control, rules, type = 'text', placeholder, label, }: ControllerTextInputProps) => {
     const required = Object.keys(rules || {}).includes('required');
 
     return (
@@ -24,6 +25,7 @@ export const ControllerTextInput = ({ className = '', name, control, rules, type
                 name={name}
                 control={control}
                 rules={rules}
+                disabled={disabled}
                 render={({ field, fieldState: { error } }) => (
                     <>
                         <input type={type} {...field} className={`form-control ${className}`} placeholder={placeholder} />

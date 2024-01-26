@@ -10,7 +10,7 @@ export interface UploadData {
 
 export const rtiApi = createApi({
   reducerPath: "rtiApi",
-  tagTypes: ['users', 'maintenances', 'logUser', 'applications'],
+  tagTypes: ['users', 'maintenances', 'applications'],
 
   baseQuery: fetchBaseQuery({
     baseUrl: APIBaseUrl,

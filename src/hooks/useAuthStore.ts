@@ -3,7 +3,7 @@ import { UserInterface, } from "../interfaces"
 import { useAppDispatch, useAppSelector } from "."
 
 export const useAuthStore = () => {
-    const { status, user, tfaState} = useAppSelector(state => state.auth)
+    const { status, user, tfaState, isUserAdmin } = useAppSelector(state => state.auth)
     const dispatch = useAppDispatch()
 
     const handleCheckingCredentials = () => dispatch(checkingCredentials())
@@ -16,6 +16,7 @@ export const useAuthStore = () => {
         status,
         user,
         tfaState,
+        isUserAdmin,
 
         //Methods
         handleCheckingCredentials,

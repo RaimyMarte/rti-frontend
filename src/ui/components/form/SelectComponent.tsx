@@ -11,8 +11,9 @@ interface SelectComponentProps {
     RegisterOptions,
     "required"
   >
+  disabled?: boolean
 }
-export const SelectComponent = ({ name, register, formErrors, rules, label, options }: SelectComponentProps) => {
+export const SelectComponent = ({ name, disabled = false, register, formErrors, rules, label, options }: SelectComponentProps) => {
   const required = Object.keys(rules || {}).includes('required');
 
   return (
@@ -22,6 +23,7 @@ export const SelectComponent = ({ name, register, formErrors, rules, label, opti
       <select
         className="form-select"
         {...register(name, rules)}
+        disabled={disabled}
         data-choices
         data-choices-search-false
       >

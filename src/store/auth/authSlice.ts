@@ -10,12 +10,14 @@ interface InitialState {
   status: string,
   user: UserInterface | null
   tfaState: TFAState | null
+  isUserAdmin: boolean
 }
 
 const initialState: InitialState = {
   status: "checking", //'checking', 'not-authenticated', 'authenticated', 'tfa'
   user: null,
-  tfaState: null
+  tfaState: null,
+  isUserAdmin: false,
 }
 
 export const authSlice = createSlice({
@@ -25,6 +27,7 @@ export const authSlice = createSlice({
     loginState: (state, { payload }: { payload: UserInterface | null }) => {
       state.status = "authenticated";
       state.user = payload
+      state.isUserAdmin = payload?.UserRoleId === 1 || payload?.UserRoleId === 2
     },
 
     userTFAState: (state, { payload }: { payload: TFAState | null }) => {

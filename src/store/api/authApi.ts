@@ -38,7 +38,7 @@ export const authApi = rtiApi.injectEndpoints({
 
                 return response;
             },
-            invalidatesTags: ['logUser'],
+            invalidatesTags: ['users'],
         }),
 
         logout: builder.mutation<ApiResponseInterface, void>({
@@ -47,7 +47,7 @@ export const authApi = rtiApi.injectEndpoints({
                 method: 'POST',
                 headers: getHeaders(),
             }),
-            invalidatesTags: ['logUser'],
+            invalidatesTags: ['users'],
         }),
 
         checkAuth: builder.query<UserApiResponseInterface, void>({
@@ -55,7 +55,7 @@ export const authApi = rtiApi.injectEndpoints({
                 url: '/auth/check_auth',
                 headers: getHeaders(),
             }),
-            providesTags: ['logUser'],
+            providesTags: ['users'],
         }),
 
         requestResetPassword: builder.mutation<ApiResponseInterface, RequestResetPasswordBody>({

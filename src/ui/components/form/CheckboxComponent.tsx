@@ -5,9 +5,10 @@ interface CheckboxComponentProps {
     label: string;
     register: UseFormRegister<any>
     defaultChecked?: boolean
+    disabled?: boolean
 }
 
-export const CheckboxComponent = ({ name, register, defaultChecked = false, label, }: CheckboxComponentProps) => {
+export const CheckboxComponent = ({ name, register, disabled = false, defaultChecked = false, label, }: CheckboxComponentProps) => {
 
     return (
         <>
@@ -16,6 +17,7 @@ export const CheckboxComponent = ({ name, register, defaultChecked = false, labe
                 className="form-check-input"
                 type="checkbox"
                 role="switch"
+                disabled={disabled}
                 defaultChecked={defaultChecked}
             />
 
