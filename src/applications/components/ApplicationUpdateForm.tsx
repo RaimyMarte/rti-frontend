@@ -49,6 +49,9 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
         AdditionalComments: applicationData?.AdditionalComments,
     }
 
+
+
+
     const {
         handleSubmit,
         control,
@@ -57,25 +60,31 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
     } = useForm<ApplicationBody>({ defaultValues });
 
 
-    // useEffect(() => {
-    //     const defaultPreviousEducation: { [key: string]: boolean } = {};
-    //     if (!maintenancesDataLoading && maintenancesData?.data) {
-    //         const previousEducationFields = maintenancesData?.data?.PreviousEducation?.map(({ Id }: { Id: string }) => `PreviousEducation-${Id}`);
+    useEffect(() => {
+        const defaultPreviousEducation: { [key: string]: boolean } = {};
 
-    //         // Populate defaultPreviousEducation with default values
-    //         previousEducationFields?.forEach(field => {
-    //             defaultPreviousEducation[field] = false;
-    //         });
-    //         console.log(previousEducationFields)
-    //         applicationData?.ApplicationPreviousEducation?.forEach(({ Id }) => {
-    //             const key = `PreviousEducation-${Id}`;
-    //             if (key in defaultPreviousEducation) {
-    //                 defaultPreviousEducation[key] = true;
-    //                 // setValue(defaultPreviousEducation[key],fale)
-    //             }
-    //         });
-    //     }
-    // }, [maintenancesDataLoading, maintenancesData])
+        if (!maintenancesDataLoading && maintenancesData?.data) {
+            maintenancesData?.data?.PreviousEducation?.forEach(({ Id }: { Id: number }) => {
+                defaultPreviousEducation[Id] = applicationData?.ApplicationPreviousEducation?.some(({ PreviousEducationId }) => Id === PreviousEducationId);
+            });
+            console.log(defaultPreviousEducation)
+
+            // const previousEducationFields = maintenancesData?.data?.PreviousEducation?.map(({ Id }: { Id: string }) => `PreviousEducation-${Id}`);
+
+            // // Populate defaultPreviousEducation with default values
+            // previousEducationFields?.forEach(field => {
+            //     defaultPreviousEducation[field] = false;
+            // });
+            // console.log(previousEducationFields)
+            // applicationData?.ApplicationPreviousEducation?.forEach(({ Id }) => {
+            //     const key = `PreviousEducation-${Id}`;
+            //     if (key in defaultPreviousEducation) {
+            //         defaultPreviousEducation[key] = true;
+            //         // setValue(defaultPreviousEducation[key],fale)
+            //     }
+            // });
+        }
+    }, [maintenancesDataLoading, maintenancesData])
 
 
 

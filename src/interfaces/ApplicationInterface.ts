@@ -36,12 +36,6 @@ export interface ApplicationInterface {
     LastUpdatedDate: Date | null;
     Verified: boolean;
     VerifiedDate: Date | null;
-    ApplicationStatus: {
-        Name: string
-    } | null,
-    ApplicationPreferredLanguage: {
-        Name: string
-    } | null,
     ApplicationCreatedBy: {
         DisplayName: string
     } | null,

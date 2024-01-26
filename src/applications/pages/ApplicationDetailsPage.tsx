@@ -11,7 +11,6 @@ export const ApplicationDetailsPage = () => {
   const { t } = useTranslation();
 
   const { data: applicationData, isLoading: applicationDataLoading } = useGetApplicationByIdQuery(id || '')
-  console.log(applicationData)
 
   return (
     <AplicationsFormLayout breadcrumb={(t('Details'))} >
