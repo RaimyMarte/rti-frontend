@@ -22,7 +22,7 @@ export interface ApplicationInterface {
     AttendingAnySchoolsExplain: string | null;
     USAVeteran: boolean;
     NYCHAResident: boolean;
-    HowDidYourHearAboutUsId: number | null;
+    HowDidYouHearAboutUsId: number | null;
     HearABoutUsOther: string | null;
     AdditionalComments: string | null;
     ApplicationDate: Date;

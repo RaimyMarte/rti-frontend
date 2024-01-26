@@ -10,4 +10,5 @@ export interface MaintenanceInterface {
     CreatedDate: Date;
     ModifiedBy: string | null;
     ModifiedDate: Date | null;
+    SelectTitle:string | null;
   }

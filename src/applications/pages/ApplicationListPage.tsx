@@ -88,10 +88,10 @@ export const ApplicationListPage = () => {
             <div className="row">
                 <div className="col-12">
                     <div className="page-title-box d-sm-flex align-items-center justify-content-between">
-                        <h4 className="mb-sm-0">{t('Users')}</h4>
+                        <h4 className="mb-sm-0">{t('Applications')}</h4>
                         <div className="page-title-right">
                             <ol className="breadcrumb m-0">
-                                <li className="breadcrumb-item"><a href="javascript: void(0);">{t('Users')}</a></li>
+                                <li className="breadcrumb-item"><a href="javascript: void(0);">{t('Applications')}</a></li>
                                 <li className="breadcrumb-item active">{t('List')}</li>
                             </ol>
                         </div>
@@ -115,7 +115,7 @@ export const ApplicationListPage = () => {
                                         <input className="form-check-input" type="checkbox" name="chk_child" defaultValue="option1" />
                                     </div>
                                 </th>
-                                <td><Link to={`/application/new`}>{FullName} </Link></td>
+                                <td><Link to={`/application/details/${Id}`}>{FullName} </Link></td>
                                 <td>{Age}</td>
                                 <td>{EmailAddress}</td>
                                 <td>{PhoneNumber}</td>

@@ -62,6 +62,9 @@ export const Sidebar = () => {
                                     <li className="nav-item">
                                         <NavLink to="/application/list" className="nav-link">{t('List')} </NavLink>
                                     </li>
+                                    <li className="nav-item">
+                                        <NavLink to="/application/new" className="nav-link">{t('New')} </NavLink>
+                                    </li>
                                 </ul>
                             </div>
                         </li>
@@ -159,6 +162,9 @@ export const Sidebar = () => {
                                 <ul className="nav nav-sm flex-column">
                                     <li className="nav-item">
                                         <NavLink to="/application_status" className="nav-link">{t('ApplicationStatus')} </NavLink>
+                                    </li>
+                                    <li className="nav-item">
+                                        <NavLink to="/how_did_you_hear_about_us" className="nav-link">{t('HowDidYouHearAboutUs')} </NavLink>
                                     </li>
                                     <li className="nav-item">
                                         <NavLink to="/preferred_language" className="nav-link">{t('PreferredLanguage')} </NavLink>

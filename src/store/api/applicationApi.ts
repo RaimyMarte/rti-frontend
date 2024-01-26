@@ -9,25 +9,25 @@ export interface ApplicationBody {
     NickName: string | null;
     AddressLine1: string;
     AddressLine2: string | null;
-    CountryId: number | null;
-    StateId: number | null;
-    CityId: number | null;
+    CountryId?: string | null;
+    StateId?: string | null;
+    CityId?: string | null;
     PostalCode: string | null;
     DateOfBirth: Date;
-    PreferredLanguageId: number;
+    PreferredLanguageId: string;
     EmailAddress: string | null;
     PhoneNumber: string;
     AttendingAnySchools: boolean;
     AttendingAnySchoolsExplain: string | null;
     USAVeteran: boolean;
     NYCHAResident: boolean;
-    HowDidYourHearAboutUsId: number | null;
+    HowDidYouHearAboutUsId: string | null;
     HearABoutUsOther: string | null;
     AdditionalComments: string | null;
     ApplicationDate: Date;
-    StatusId: number;
-    OrientationTalk: boolean;
-    OrientationTalkDate: Date | null;
+    StatusId?: string;
+    OrientationTalk?: boolean;
+    OrientationTalkDate?: Date | null;
 }
 
 export interface GetApplicationsQueries {

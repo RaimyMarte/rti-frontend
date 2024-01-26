@@ -1,8 +1,7 @@
 import { ApplicationNewForm } from "../components";
 import { AplicationsFormLayout } from "../layout/AplicationsFormLayout";
 
-export const ApplicationDetailsPage = () => {
-
+export const ApplicationNewPage = () => {
 
   return (
     <AplicationsFormLayout>

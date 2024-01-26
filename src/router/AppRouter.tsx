@@ -1,5 +1,5 @@
 import { AdminUserDetailsPage, CurrentUserProfilePage, } from "../user/pages"
-import { ApplicationDetailsPage, ApplicationListPage } from "../applications/pages"
+import { ApplicationDetailsPage, ApplicationListPage, ApplicationNewPage } from "../applications/pages"
 import { ChangePasswordNextLoginPage, ForgotPasswordPage, LoginPage, ResetPasswordPage, TwoFactorAuthPage } from "../auth/pages"
 import { getMaintenancesModules } from "../maintenance/helpers"
 import { HomePage } from "../dashboard/pages"
@@ -31,6 +31,7 @@ export const AppRouter = ({ t }: { t: TFunction<"translation", undefined> }) => 
                 <Route path="/home" element={<HomePage />} />
 
                 <Route path="/application/list/" element={<ApplicationListPage />} />
+                <Route path="/application/new/" element={<ApplicationNewPage />} />
                 <Route path="/application/details/:id" element={<ApplicationDetailsPage />} />
 
 

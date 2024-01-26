@@ -9,6 +9,13 @@ export const getMaintenancesModules = (t: TFunction<"translation", undefined>) =
         breadcrumb: t('Maintenance'),
     },
     {
+        maintenanceName: "HowDidYouHearAboutUs",
+        maintenanceTitle: t('HowDidYouHearAboutUs'),
+        maintenanceButtonText: t('howDidYouHearAboutUsButton'),
+        link: '/how_did_you_hear_about_us',
+        breadcrumb: t('Maintenance'),
+    },
+    {
         maintenanceName: "PreferredLanguage",
         maintenanceTitle: t('PreferredLanguage'),
         maintenanceButtonText: t('preferredLanguageButton'),

@@ -31,6 +31,11 @@ interface GetAllMaintenanceWithPaginationQueries {
     maintenanceName: string
 }
 
+interface GetSelectedMaintenances {
+    selectedMaintenances: string[]
+    Lang: string
+}
+
 export const maintenanceApi = rtiApi.injectEndpoints({
     endpoints: (builder) => ({
         getMaintenance: builder.query<ApiResponseInterface, string>({
@@ -43,12 +48,13 @@ export const maintenanceApi = rtiApi.injectEndpoints({
             providesTags: ['maintenances'],
         }),
 
-        getSelectedMaintenances: builder.query<ApiResponseInterface, string[]>({
-            query: (selectedMaintenances) => ({
+        getSelectedMaintenances: builder.query<ApiResponseInterface, GetSelectedMaintenances>({
+            query: ({ selectedMaintenances, Lang }) => ({
                 url: '/get_all_selected_maintenances',
                 method: 'POST',
-                body: { selectedMaintenances },
+                body: { selectedMaintenances, Lang },
             }),
+            providesTags: ['maintenances'],
         }),
 
         getMaintenanceById: builder.query<ApiResponseInterface, MaintenanceById>({
