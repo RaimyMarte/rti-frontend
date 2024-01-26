@@ -29,6 +29,10 @@ export interface ApplicationBody {
     OrientationTalk?: boolean;
     OrientationTalkDate?: Date | null;
 }
+export interface ApplicationUpdate {
+    body: ApplicationBody
+    id: string
+}
 
 export interface GetApplicationsQueries {
     page: number
@@ -65,9 +69,9 @@ export const applicationApi = rtiApi.injectEndpoints({
             invalidatesTags: ['applications'],
         }),
 
-        updateApplication: builder.mutation<ApiResponseInterface, ApplicationBody>({
-            query: (body) => ({
-                url: '/application_get_by_id',
+        updateApplication: builder.mutation<ApiResponseInterface, ApplicationUpdate>({
+            query: ({ body, id }) => ({
+                url: `/application_update/${id}`,
                 method: 'PATCH',
                 body,
                 headers: getHeaders(),

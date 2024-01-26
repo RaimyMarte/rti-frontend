@@ -15,14 +15,14 @@ export interface ApplicationInterface {
     PostalCode: string | null;
     DateOfBirth: Date;
     Age: number;
-    PreferredLanguageId: number;
+    PreferredLanguageId: string;
     EmailAddress: string | null;
     PhoneNumber: string;
     AttendingAnySchools: boolean;
     AttendingAnySchoolsExplain: string | null;
     USAVeteran: boolean;
     NYCHAResident: boolean;
-    HowDidYouHearAboutUsId: number | null;
+    HowDidYouHearAboutUsId: string | null;
     HearABoutUsOther: string | null;
     AdditionalComments: string | null;
     ApplicationDate: Date;

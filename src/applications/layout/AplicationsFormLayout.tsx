@@ -2,7 +2,13 @@ import { useTranslation } from "react-i18next";
 import { MainLayout } from "../../layout"
 import { ReactNode } from "react";
 
-export const AplicationsFormLayout = ({ children }: { children: ReactNode }) => {
+interface AplicationsFormLayoutProps {
+    children: ReactNode,
+    breadcrumb: string
+}
+
+
+export const AplicationsFormLayout = ({ children, breadcrumb }: AplicationsFormLayoutProps) => {
     const { t } = useTranslation();
 
     return (
@@ -14,7 +20,7 @@ export const AplicationsFormLayout = ({ children }: { children: ReactNode }) => 
                         <div className="page-title-right">
                             <ol className="breadcrumb m-0">
                                 <li className="breadcrumb-item"><a href="javascript: void(0);">{t('Applications')}</a></li>
-                                <li className="breadcrumb-item active">{t('New')}</li>
+                                <li className="breadcrumb-item active">{breadcrumb}</li>
                             </ol>
                         </div>
                     </div>
