@@ -26,7 +26,7 @@ export const tfaApi = rtiApi.injectEndpoints({
 
                 return response;
             },
-            invalidatesTags: ['logUser'],
+            invalidatesTags: ['users'],
         }),
 
         generateTFAKey: builder.query<ApiResponseInterface, void>({
@@ -45,7 +45,7 @@ export const tfaApi = rtiApi.injectEndpoints({
                 body: { token },
                 headers: getHeaders(),
             }),
-            invalidatesTags: ['logUser'],
+            invalidatesTags: ['users'],
         }),
 
         disableTFA: builder.mutation<ApiResponseInterface, void>({
@@ -54,7 +54,7 @@ export const tfaApi = rtiApi.injectEndpoints({
                 method: 'POST',
                 headers: getHeaders(),
             }),
-            invalidatesTags: ['logUser'],
+            invalidatesTags: ['users'],
         }),
     }),
 })
