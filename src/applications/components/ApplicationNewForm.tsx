@@ -6,6 +6,7 @@ import { MaintenanceInterface } from "../../interfaces";
 import { useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 interface ApplicationNewFormProps {
     createApplication: any
@@ -25,6 +26,7 @@ const applicationsPublicUrl: string = `${import.meta.env.VITE_API_PUBLIC_URL}/ap
 
 export const ApplicationNewForm = ({ createApplication, way }: ApplicationNewFormProps) => {
     const { t } = useTranslation()
+    const navigate = useNavigate()
 
     const { data: maintenancesData, isLoading: maintenancesDataLoading } = useGetSelectedMaintenancesQuery({ selectedMaintenances, Lang: '' })
 
@@ -55,10 +57,16 @@ export const ApplicationNewForm = ({ createApplication, way }: ApplicationNewFor
                 toast.success(respData?.message)
                 reset()
 
-
-                if (respData?.data?.PDF) {
-                    await delay(1500)
-                    window.open(`${applicationsPublicUrl}/${respData?.data?.PDF}`, '_blank');
+                if (way === 'local') {
+                    navigate('/application/list');
+                } else {
+                    const pdfUrl = respData?.data?.PDF;
+                    if (pdfUrl) {
+                        await delay(1500); // Delay before opening PDF (optional)
+                        window.open(`${applicationsPublicUrl}/${pdfUrl}`, '_blank');
+                    } else {
+                        toast.error("PDF not available for this application");
+                    }
                 }
             }
         } catch (error) {
