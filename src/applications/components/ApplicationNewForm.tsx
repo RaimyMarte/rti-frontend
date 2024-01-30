@@ -6,6 +6,7 @@ import { MaintenanceInterface } from "../../interfaces";
 import { useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
+import { useLocation } from "react-router-dom";
 
 
 const selectedMaintenances: string[] = [
@@ -18,6 +19,7 @@ const selectedMaintenances: string[] = [
 
 export const ApplicationNewForm = ({ createApplication }: { createApplication: any }) => {
     const { t } = useTranslation()
+    const location = useLocation();
 
     const { data: maintenancesData, isLoading: maintenancesDataLoading } = useGetSelectedMaintenancesQuery({ selectedMaintenances, Lang: '' })
 
@@ -190,19 +192,24 @@ export const ApplicationNewForm = ({ createApplication }: { createApplication: a
                                 </div>
                             </div>
 
-                            <h5 className="card-title mb-3 mt-3">{t('Application Information')}</h5>
-                            <div className="col-lg-6">
-                                <div className="mb-3">
-                                    <TextInputComponent
-                                        name="ApplicationDate"
-                                        register={register}
-                                        formErrors={formErrors}
-                                        label={t('Application Date')}
-                                        placeholder={`${t('Enter')} ${t('Application Date')}`}
-                                        type='date'
-                                    />
-                                </div>
-                            </div>
+                            {
+                                location.pathname !== '/apply_now'
+                                && <>
+                                    <h5 className="card-title mb-3 mt-3">{t('Application Information')}</h5>
+                                    <div className="col-lg-6">
+                                        <div className="mb-3">
+                                            <TextInputComponent
+                                                name="ApplicationDate"
+                                                register={register}
+                                                formErrors={formErrors}
+                                                label={t('Application Date')}
+                                                placeholder={`${t('Enter')} ${t('Application Date')}`}
+                                                type='date'
+                                            />
+                                        </div>
+                                    </div>
+                                </>
+                            }
 
                             <h5 className="card-title mb-3 mt-3">{t('Previous Education')}</h5>
                             {

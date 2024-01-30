@@ -14,7 +14,7 @@ interface FormInputs {
 export const ResetPasswordPage = () => {
   const navigate = useNavigate()
   const location = useLocation();
-  const currentUrl = `http://localhost:5173${location.pathname}${location.search}`;
+  const currentUrl = `https://portal.rtiny.org/${location.pathname}${location.search}`;
 
   const { data: dataIpApi, isLoading: dataIpApiLoading } = useGetIPQuery()
   const [confirmResetPassword, { isLoading: confirmResetPasswordLoading }] = useConfirmResetPasswordMutation()
