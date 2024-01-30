@@ -35,6 +35,7 @@ export interface ApplicationInterface {
     LastUpdatedBy: string | null;
     LastUpdatedDate: Date | null;
     Verified: boolean;
+    PDF:string|null;
     VerifiedDate: Date | null;
     ApplicationCreatedBy: {
         DisplayName: string

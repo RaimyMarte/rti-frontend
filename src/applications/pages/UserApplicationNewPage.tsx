@@ -15,7 +15,7 @@ export const UserApplicationNewPage = () => {
           <div className="card">
             <div className="card-body">
               {userCreateApplicationLoading ? <Loading /> : null}
-              <ApplicationNewForm createApplication={userCreateApplication} />
+              <ApplicationNewForm way="local" createApplication={userCreateApplication} />
             </div>
           </div>
         </div>

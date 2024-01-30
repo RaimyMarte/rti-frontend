@@ -16,6 +16,8 @@ interface SearchForm {
     search: string
 }
 
+const applicationsPublicUrl: string = `${import.meta.env.VITE_API_PUBLIC_URL}/applications`
+
 export const ApplicationListPage = () => {
     const { t } = useTranslation();
     const { isUserAdmin } = useAuthStore()
@@ -108,7 +110,7 @@ export const ApplicationListPage = () => {
                 columns={tableColumns}
                 rows={
                     applicationsData?.data.map((application: ApplicationInterface,) => {
-                        const { Id, FullName, Age, EmailAddress, PhoneNumber, CreatedDate, } = application
+                        const { Id, FullName, Age, EmailAddress, PhoneNumber, CreatedDate,PDF } = application
 
                         return (
                             <tr key={Id}>
@@ -124,6 +126,11 @@ export const ApplicationListPage = () => {
                                 <td>{dayjs(CreatedDate).format('MM/DD/YYYY HH:mm:ss')}</td>
                                 <td>
                                     <ul className="list-inline hstack gap-2 mb-0">
+                                    <li className="list-inline-item " data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title={t("Open PDF")} style={{ display: PDF ? '' : 'none' }}>
+                                            <a className="text-primary d-inline-block" target='_blank' href={`${applicationsPublicUrl}/${PDF}`}>
+                                                <i className="ri-file-text-line fs-16" />
+                                            </a>
+                                        </li>
                                         <li className="list-inline-item edit" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title={t("Edit")}>
                                             <Link to={`/application/details/${Id}`} className="text-primary d-inline-block edit-item-btn">
                                                 <i className="ri-pencil-fill fs-16" />

@@ -1,12 +1,16 @@
 import { ApplicationBody, useGetSelectedMaintenancesQuery } from "../../store/api";
 import { CheckboxComponent, SelectComponent, TextAreaInputComponent, TextInputComponent } from "../../ui/components/form";
-import { isMutationSuccessResponse } from "../../utils";
+import { delay, isMutationSuccessResponse } from "../../utils";
 import { Loading } from "../../ui/components";
 import { MaintenanceInterface } from "../../interfaces";
 import { useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
-import { useLocation } from "react-router-dom";
+
+interface ApplicationNewFormProps {
+    createApplication: any
+    way: 'local' | 'internet';
+}
 
 
 const selectedMaintenances: string[] = [
@@ -17,9 +21,10 @@ const selectedMaintenances: string[] = [
     'PreviousEducation',
 ];
 
-export const ApplicationNewForm = ({ createApplication }: { createApplication: any }) => {
+const applicationsPublicUrl: string = `${import.meta.env.VITE_API_PUBLIC_URL}/applications`
+
+export const ApplicationNewForm = ({ createApplication, way }: ApplicationNewFormProps) => {
     const { t } = useTranslation()
-    const location = useLocation();
 
     const { data: maintenancesData, isLoading: maintenancesDataLoading } = useGetSelectedMaintenancesQuery({ selectedMaintenances, Lang: '' })
 
@@ -49,6 +54,12 @@ export const ApplicationNewForm = ({ createApplication }: { createApplication: a
 
                 toast.success(respData?.message)
                 reset()
+
+
+                if (respData?.data?.PDF) {
+                    await delay(1500)
+                    window.open(`${applicationsPublicUrl}/${respData?.data?.PDF}`, '_blank');
+                }
             }
         } catch (error) {
             toast.error(`An error occurred: ${error}`);
@@ -193,7 +204,7 @@ export const ApplicationNewForm = ({ createApplication }: { createApplication: a
                             </div>
 
                             {
-                                location.pathname !== '/apply_now'
+                                way === 'local'
                                 && <>
                                     <h5 className="card-title mb-3 mt-3">{t('Application Information')}</h5>
                                     <div className="col-lg-6">

@@ -35,7 +35,7 @@ export const ApplicationNewPage = () => {
                             <div className="card mt-4">
                                 <div className="card-body p-4">
                                     {createApplicationLoading ? <Loading /> : null}
-                                    <ApplicationNewForm createApplication={createApplication} />
+                                    <ApplicationNewForm way="internet" createApplication={createApplication} />
                                 </div>
                                 {/* end card body */}
                             </div>
