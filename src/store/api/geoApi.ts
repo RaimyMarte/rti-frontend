@@ -1,15 +1,18 @@
-import { rtiApi } from '.';
-import { getHeaders } from '../../utils';
 import { ApiResponseInterface, } from '../../interfaces';
+import { rtiApi } from '.';
 
 
 export const geoApi = rtiApi.injectEndpoints({
     endpoints: (builder) => ({
+        getNationalities: builder.query<ApiResponseInterface, void>({
+            query: () => ({
+                url: '/get_all_nationalities',
+            }),
+        }),
 
         getCountries: builder.query<ApiResponseInterface, void>({
             query: () => ({
                 url: '/get_all_countries',
-                headers: getHeaders(),
             }),
         }),
 
@@ -28,6 +31,7 @@ export const geoApi = rtiApi.injectEndpoints({
 });
 
 export const {
+    useGetNationalitiesQuery,
     useGetCountriesQuery,
     useGetStatesQuery,
     useGetCitiesQuery,

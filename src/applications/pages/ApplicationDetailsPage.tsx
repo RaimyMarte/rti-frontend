@@ -1,8 +1,8 @@
-import { useParams } from "react-router-dom";
-import { ApplicationUpdateForm } from "../components";
 import { AplicationsFormLayout } from "../layout/AplicationsFormLayout";
-import { useGetApplicationByIdQuery } from "../../store/api";
+import { ApplicationUpdateForm } from "../components";
 import { Loading } from "../../ui/components";
+import { useGetApplicationByIdQuery } from "../../store/api";
+import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 
@@ -39,16 +39,13 @@ export const ApplicationDetailsPage = () => {
                           <tr>
                             <th className="ps-0" scope="row">{t('Created Date')}:</th>
                             <td className="text-muted">{applicationData?.data?.CreatedDate ? dayjs(applicationData?.data?.CreatedDate).format('MM/DD/YYYY (hh:mm:ss A)') : ''}</td>
-                          </tr>
-                          <tr>
                             <th className="ps-0" scope="row">{t('Created By')}:</th>
                             <td className="text-muted">{applicationData?.data?.ApplicationCreatedBy?.DisplayName || 'None'}</td>
                           </tr>
+
                           <tr>
                             <th className="ps-0" scope="row">{t('Last Updated By')}:</th>
                             <td className="text-muted">{applicationData?.data?.ApplicationLastUpdatedBy?.DisplayName || 'None'}</td>
-                          </tr>
-                          <tr>
                             <th className="ps-0" scope="row">{t('Last Updated Date')}:</th>
                             <td className="text-muted">{applicationData?.data?.LastUpdatedDate ? dayjs(applicationData?.data?.LastUpdatedDate).format('MM/DD/YYYY (hh:mm:ss A)') : ''}</td>
                           </tr>
@@ -61,10 +58,13 @@ export const ApplicationDetailsPage = () => {
                                   : <i className="ri-close-circle-line align-middle text-danger"></i>
                               }
                             </td>
-                          </tr>
-                          <tr>
                             <th className="ps-0" scope="row">{t('Verified Date')}:</th>
                             <td className="text-muted">{applicationData?.data?.VerifiedDate ? dayjs(applicationData?.data?.VerifiedDate).format('MM/DD/YYYY (hh:mm:ss A)') : ''}</td>
+                          </tr>
+
+                          <tr>
+                            <th className="ps-0" scope="row">{t('Status')}:</th>
+                            <td className="text-muted">{applicationData?.data?.ApplicationStatus?.Name}</td>
                           </tr>
                         </tbody>
                       </table>

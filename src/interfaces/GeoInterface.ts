@@ -1,4 +1,5 @@
 export interface GeoInterface {
-    Name: string
+    Name?: string
+    Nationality?: string
     Id: number
 }

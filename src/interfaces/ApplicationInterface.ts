@@ -7,11 +7,13 @@ export interface ApplicationInterface {
     LastName: string;
     NickName: string | null;
     FullName: string;
+    Gender: string | null;
     AddressLine1: string;
     AddressLine2: string | null;
-    CountryId: number | null;
-    StateId: number | null;
-    CityId: number | null;
+    CountryId: string | null;
+    StateId: string | null;
+    CityId: string | null;
+    NationalityId: string | null;
     PostalCode: string | null;
     DateOfBirth: Date;
     Age: number;
@@ -19,6 +21,7 @@ export interface ApplicationInterface {
     EmailAddress: string | null;
     PhoneNumber: string;
     AttendingAnySchools: boolean;
+    AttendingAnySchoolsId: string | null;
     AttendingAnySchoolsExplain: string | null;
     USAVeteran: boolean;
     NYCHAResident: boolean;
@@ -27,7 +30,7 @@ export interface ApplicationInterface {
     AdditionalComments: string | null;
     ApplicationDate: Date;
     Way: string | null;
-    StatusId: number;
+    StatusId: string;
     OrientationTalk: boolean;
     OrientationTalkDate: Date | null;
     CreatedBy: string | null;
@@ -35,7 +38,7 @@ export interface ApplicationInterface {
     LastUpdatedBy: string | null;
     LastUpdatedDate: Date | null;
     Verified: boolean;
-    PDF:string|null;
+    PDF: string | null;
     VerifiedDate: Date | null;
     ApplicationCreatedBy: {
         DisplayName: string
@@ -47,6 +50,9 @@ export interface ApplicationInterface {
         Id: number;
         AcademyProgramId: string;
     }[];
+    ApplicationStatus: {
+        Name: string
+    } | null,
     ApplicationPreviousEducation: {
         Id: number;
         PreviousEducationId: number;

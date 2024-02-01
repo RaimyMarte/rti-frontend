@@ -1,5 +1,5 @@
-import { ApplicationBody, useUpdateApplicationMutation, useGetSelectedMaintenancesQuery } from "../../store/api";
-import { ApplicationInterface, MaintenanceInterface } from "../../interfaces";
+import { ApplicationBody, useUpdateApplicationMutation, useGetSelectedMaintenancesQuery, useGetCountriesQuery, useGetStatesQuery, useGetCitiesQuery, useGetNationalitiesQuery } from "../../store/api";
+import { ApplicationInterface, GeoInterface, MaintenanceInterface } from "../../interfaces";
 import { ControllerCheckbox, ControllerTextInput, ControllerSelect, ControllerTextAreaInput, } from "../../ui/components/form";
 import { isMutationSuccessResponse } from "../../utils";
 import { Loading } from "../../ui/components";
@@ -32,6 +32,7 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
         MiddleName: applicationData?.MiddleName,
         LastName: applicationData?.LastName,
         NickName: applicationData?.NickName,
+        Gender: applicationData?.Gender,
         EmailAddress: applicationData?.EmailAddress,
         PhoneNumber: applicationData?.PhoneNumber,
         AddressLine1: applicationData?.AddressLine1,
@@ -39,18 +40,21 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
         PostalCode: applicationData?.PostalCode,
         DateOfBirth: applicationData?.DateOfBirth,
         ApplicationDate: applicationData?.ApplicationDate,
+        NationalityId: applicationData?.NationalityId,
+        CountryId: applicationData?.CountryId,
+        StateId: applicationData?.StateId,
+        CityId: applicationData?.CityId,
         PreferredLanguageId: applicationData?.PreferredLanguageId,
         AttendingAnySchools: applicationData?.AttendingAnySchools,
         AttendingAnySchoolsExplain: applicationData?.AttendingAnySchoolsExplain,
+        StatusId: applicationData?.StatusId,
+        AttendingAnySchoolsId: applicationData?.AttendingAnySchoolsId,
         USAVeteran: applicationData?.USAVeteran,
         NYCHAResident: applicationData?.NYCHAResident,
         HowDidYouHearAboutUsId: applicationData?.HowDidYouHearAboutUsId,
         HearABoutUsOther: applicationData?.HearABoutUsOther,
         AdditionalComments: applicationData?.AdditionalComments,
     }
-
-
-
 
     const {
         handleSubmit,
@@ -59,6 +63,17 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
         // setValue
     } = useForm<ApplicationBody>({ defaultValues });
 
+    const { data: countries, isLoading: countriesLoading, } = useGetCountriesQuery()
+    const { data: nationalities, isLoading: nationalityLoading, } = useGetNationalitiesQuery()
+
+    const AttendingAnySchools = useWatch({ control, name: 'AttendingAnySchools' })
+    const HowDidYouHearAboutUsId = useWatch({ control, name: 'HowDidYouHearAboutUsId' })
+    const AttendingAnySchoolsId = useWatch({ control, name: 'AttendingAnySchoolsId' })
+    const CountryId = useWatch({ control, name: "CountryId" }) || ''
+    const StateId = useWatch({ control, name: "StateId" }) || ''
+
+    const { data: states, isLoading: statesLoading, } = useGetStatesQuery(CountryId)
+    const { data: cities, isLoading: citiesLoading, } = useGetCitiesQuery({ countryId: CountryId, stateId: StateId })
 
     useEffect(() => {
         const defaultPreviousEducation: { [key: string]: boolean } = {};
@@ -67,7 +82,7 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
             maintenancesData?.data?.PreviousEducation?.forEach(({ Id }: { Id: number }) => {
                 defaultPreviousEducation[Id] = applicationData?.ApplicationPreviousEducation?.some(({ PreviousEducationId }) => Id === PreviousEducationId);
             });
-            console.log(defaultPreviousEducation)
+
 
             // const previousEducationFields = maintenancesData?.data?.PreviousEducation?.map(({ Id }: { Id: string }) => `PreviousEducation-${Id}`);
 
@@ -86,15 +101,10 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
         }
     }, [maintenancesDataLoading, maintenancesData])
 
-
-
-    const AttendingAnySchools = useWatch({ control, name: 'AttendingAnySchools' })
-    const HowDidYouHearAboutUsId = useWatch({ control, name: 'HowDidYouHearAboutUsId' })
-
-    const isDataLoading = maintenancesDataLoading
+    const isDataLoading = maintenancesDataLoading || countriesLoading || nationalityLoading
 
     const onFormSubmit = async (data: ApplicationBody) => {
-        console.log(data)
+
         try {
             const response = await updateApplication({ body: data, id: applicationData?.Id });
             if (isMutationSuccessResponse(response)) {
@@ -121,13 +131,49 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
     return (
         isDataLoading
             ? <Loading />
-            : <form onSubmit={handleSubmit(onFormSubmit)} className="tablelist-form">
+            :
+            <form onSubmit={handleSubmit(onFormSubmit)} className="tablelist-form">
                 <div className="row">
-                    {updateApplicationLoading ? <Loading /> : null}
-                    <div className="col-lg-6">
-                        <h5 className="card-title mb-3">{t('Information')}</h5>
+                    <div className="col-lg-12">
                         <div className="row">
-                            <div className="col-lg-6">
+                            {statesLoading || citiesLoading && <Loading />}
+                            {updateApplicationLoading && <Loading />}
+                            <h4 className=" mb-3">{t('01 - New Application')}</h4>
+
+                            <div className="col-lg-4">
+                                <div className="mb-3">
+                                    <ControllerTextInput
+                                        name="ApplicationDate"
+                                        control={control}
+                                        label={t('Application Date')}
+                                        placeholder={`${t('Enter')} ${t('Application Date')}`}
+                                        type='date'
+                                        rules={{
+                                            required: `'${t('Application Date')} ${t('is required')}'`,
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-8">
+                                <div className="mb-3">
+                                    <ControllerSelect
+                                        name="StatusId"
+                                        control={control}
+                                        label={t('ApplicationStatus')}
+                                        options={
+                                            maintenancesData?.data?.ApplicationStatus.map((maintenance: MaintenanceInterface) => {
+                                                const { SelectTitle, Id } = maintenance
+
+                                                return (
+                                                    <option key={Id} value={Id}>{SelectTitle}</option>
+                                                )
+                                            })
+                                        }
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="col-lg-4">
                                 <div className="mb-3">
                                     <ControllerTextInput
                                         name="FirstName"
@@ -140,7 +186,7 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
                                     />
                                 </div>
                             </div>
-                            <div className="col-lg-6">
+                            <div className="col-lg-4">
                                 <div className="mb-3">
                                     <ControllerTextInput
                                         name="MiddleName"
@@ -150,7 +196,7 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
                                     />
                                 </div>
                             </div>
-                            <div className="col-lg-6">
+                            <div className="col-lg-4">
                                 <div className="mb-3">
                                     <ControllerTextInput
                                         name="LastName"
@@ -163,7 +209,8 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
                                     />
                                 </div>
                             </div>
-                            <div className="col-lg-6">
+
+                            <div className="col-lg-4">
                                 <div className="mb-3">
                                     <ControllerTextInput
                                         name="NickName"
@@ -174,7 +221,55 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
                                 </div>
                             </div>
 
-                            <div className="col-lg-6">
+                            <div className="col-lg-4">
+                                <div className="mb-3">
+                                    <ControllerSelect
+                                        name="NationalityId"
+                                        control={control}
+                                        label={t('Nationality')}
+                                        options={
+                                            nationalities?.data.map((nationality: GeoInterface) => {
+                                                const { Nationality, Id } = nationality
+
+                                                return (
+                                                    <option key={Id} value={Id}>{Nationality}</option>
+                                                )
+                                            })
+                                        }
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="col-lg-4">
+                                <div className="mb-3">
+                                    <ControllerTextInput
+                                        name="DateOfBirth"
+                                        control={control}
+                                        label={t('DateofBirth')}
+                                        placeholder={`${t('Enter')} ${t('DateofBirth')}`}
+                                        type='date'
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="col-lg-4">
+                                <div className="mb-3">
+                                    <ControllerSelect
+                                        name="Gender"
+                                        control={control}
+                                        label={t('Gender')}
+                                        options={
+                                            <>
+                                                <option value='M'>{t('Male')} </option>
+                                                <option value='F'>{t('Female')} </option>
+                                                <option value='U'>{t('Unknow')} </option>
+                                            </>
+                                        }
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="col-lg-4">
                                 <div className="mb-3">
                                     <ControllerTextInput
                                         name="EmailAddress"
@@ -192,34 +287,105 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
                                 </div>
                             </div>
 
-                            <div className="col-lg-6">
+                            <div className="col-lg-4">
                                 <div className="mb-3">
                                     <ControllerTextInput
                                         name="PhoneNumber"
                                         control={control}
                                         label={t('Phone Number')}
                                         placeholder={`${t('Enter')} ${t('Phone Number')}`}
+                                        rules={{
+                                            required: `'${t('Phone')} ${t('is required')}'`,
+                                        }}
                                     />
                                 </div>
                             </div>
 
-                            <div className="col-lg-12">
+                            <div className="col-lg-6">
                                 <div className="mb-3">
                                     <ControllerTextInput
                                         name="AddressLine1"
                                         control={control}
                                         label={t('Address')}
                                         placeholder={`${t('Enter')} ${t('Address')}`}
+                                        rules={{
+                                            required: `'${t('Address')} ${t('is required')}'`,
+                                        }}
                                     />
-                                    <ControllerTextInput
-                                        name="AddressLine2"
+                                </div>
+                            </div>
+
+                            <div className="col-lg-3">
+                                <div className="mb-3">
+                                    <ControllerSelect
+                                        name="CountryId"
                                         control={control}
-                                        placeholder={`${t('Enter')} ${t('Address')}`}
+                                        label={t('Country')}
+                                        options={
+                                            countries?.data.map((country: GeoInterface) => {
+                                                const { Name, Id } = country
+
+                                                return (
+                                                    <option key={Id} value={Id}>{Name}</option>
+                                                )
+                                            })
+                                        }
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="col-lg-3">
+                                <div className="mb-3">
+                                    <ControllerSelect
+                                        name="StateId"
+                                        control={control}
+                                        label={t('State')}
+                                        disabled={!CountryId}
+                                        options={
+                                            states?.data.map((state: GeoInterface) => {
+                                                const { Name, Id } = state
+
+                                                return (
+                                                    <option key={Id} value={Id}>{Name}</option>
+                                                )
+                                            })
+                                        }
                                     />
                                 </div>
                             </div>
 
                             <div className="col-lg-6">
+                                <div className="mb-3">
+                                    <ControllerTextInput
+                                        name="AddressLine2"
+                                        control={control}
+                                        label="Apt - Number"
+                                        placeholder={`${t('Enter')} ${t('Apt - Number')}`}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="col-lg-3">
+                                <div className="mb-3">
+                                    <ControllerSelect
+                                        name="CityId"
+                                        control={control}
+                                        disabled={!StateId && !CountryId}
+                                        label={t('City')}
+                                        options={
+                                            cities?.data.map((city: GeoInterface) => {
+                                                const { Name, Id } = city
+
+                                                return (
+                                                    <option key={Id} value={Id}>{Name}</option>
+                                                )
+                                            })
+                                        }
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="col-lg-3">
                                 <div className="mb-3">
                                     <ControllerTextInput
                                         name="PostalCode"
@@ -229,197 +395,199 @@ export const ApplicationUpdateForm = ({ applicationData }: ApplicationUpdateForm
                                     />
                                 </div>
                             </div>
-
-                            <div className="col-lg-6">
-                                <div className="mb-3">
-                                    <ControllerTextInput
-                                        name="DateOfBirth"
-                                        control={control}
-                                        label={t('DateofBirth')}
-                                        placeholder={`${t('Enter')} ${t('DateofBirth')}`}
-                                        type='date'
-                                    />
-                                </div>
-                            </div>
-
-                            <h5 className="card-title mb-3 mt-3">{t('Application Information')}</h5>
-                            <div className="col-lg-6">
-                                <div className="mb-3">
-                                    <ControllerTextInput
-                                        name="ApplicationDate"
-                                        control={control}
-                                        label={t('Application Date')}
-                                        placeholder={`${t('Enter')} ${t('Application Date')}`}
-                                        type='date'
-                                    />
-                                </div>
-                            </div>
-
-                            <h5 className="card-title mb-3 mt-3">{t('Previous Education')}</h5>
-                            {
-                                maintenancesData?.data?.PreviousEducation.map((maintenance: MaintenanceInterface) => {
-                                    const { SelectTitle, Id } = maintenance
-
-                                    return (
-                                        <div key={Id} className="col-lg-6">
-                                            <div className="mb-3 form-check">
-                                                <ControllerCheckbox
-                                                    control={control}
-                                                    name={`PreviousEducation-${Id}`}
-                                                    label={SelectTitle || ''}
-                                                />
-                                            </div>
-                                        </div>
-                                    )
-                                })
-                            }
                         </div>
-                        {/*end row*/}
                     </div>
 
-                    <div className="col-lg-6">
-                        <h5 className="card-title mb-3">{t('Extra Information')}</h5>
-
-                        <div className="row">
-                            <div className="col-lg-12">
-                                <div className="mb-3">
-                                    <ControllerSelect
-                                        name="PreferredLanguageId"
-                                        control={control}
-                                        label={t('PreferredLanguage')}
-                                        options={
-                                            maintenancesData?.data?.PreferredLanguage.map((maintenance: MaintenanceInterface) => {
-                                                const { SelectTitle, Id } = maintenance
-
-                                                return (
-                                                    <option key={Id} value={Id}>{SelectTitle}</option>
-                                                )
-                                            })
-                                        }
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="col-lg-12">
-                                <div className="mb-3 form-check">
-                                    <ControllerCheckbox
-                                        control={control}
-                                        name="AttendingAnySchools"
-                                        label={t('Attending Any Schools')}
-                                    />
-                                </div>
-                            </div>
-
-                            {
-                                AttendingAnySchools &&
-                                <div className="col-lg-12">
-                                    <div className="mb-3">
-                                        <ControllerTextAreaInput
-                                            name="AttendingAnySchoolsExplain"
-                                            control={control}
-                                            label={t('Attending Any Schools Explain')}
-                                            placeholder={`${t('Enter')} ${t('Attending Any Schools Explain')}`}
-                                        />
-                                    </div>
-                                </div>
-                            }
-
-                            <div className="col-lg-6">
-                                <div className="mb-3 form-check">
-                                    <ControllerCheckbox
-                                        control={control}
-                                        name="USAVeteran"
-                                        label={t('USA Veteran')}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="col-lg-6">
-                                <div className="mb-3 form-check">
-                                    <ControllerCheckbox
-                                        control={control}
-                                        name="NYCHAResident"
-                                        label={t('NYCHA Resident')}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="col-lg-12">
-                                <div className="mb-3">
-                                    <ControllerSelect
-                                        name="HowDidYouHearAboutUsId"
-                                        control={control}
-                                        label={t('HowDidYouHearAboutUs')}
-                                        options={
-                                            maintenancesData?.data?.HowDidYouHearAboutUs.map((maintenance: MaintenanceInterface) => {
-                                                const { SelectTitle, Id } = maintenance
-
-                                                return (
-                                                    <option key={Id} value={Id}>{SelectTitle}</option>
-                                                )
-                                            })
-                                        }
-                                    />
-                                </div>
-                            </div>
-
-                            {
-                                HowDidYouHearAboutUsId === '3' &&
-                                <div className="col-lg-12">
-                                    <div className="mb-3">
-                                        <ControllerTextAreaInput
-                                            name="HearABoutUsOther"
-                                            control={control}
-                                            label={t('Hear ABout Us Other')}
-                                            placeholder={`${t('Enter')} ${t('Hear ABout Us Other')}`}
-                                        />
-                                    </div>
-                                </div>
-                            }
-
-                            <div className="col-lg-12">
-                                <div className="mb-3">
-                                    <ControllerTextAreaInput
-                                        name="AdditionalComments"
-                                        control={control}
-                                        label={t('Additional Comments')}
-                                        placeholder={`${t('Enter')} ${t('Additional Comments')}`}
-                                    />
-                                </div>
-                            </div>
-
-                            <h5 className="card-title mb-3 mt-3">{t('Which Program are you interested in?')}</h5>
-                            <div className="col-lg-12 border mb-3">
-                                <div className="row mt-3">
-                                    {
-                                        maintenancesData?.data?.AcademyProgram.map((maintenance: MaintenanceInterface) => {
+                    <h4 className="mb-3 mt-3">{t('02 - Extra Information')}</h4>
+                    <div className="row">
+                        <div className="col-lg-12">
+                            <div className="mb-3">
+                                <ControllerSelect
+                                    name="PreferredLanguageId"
+                                    control={control}
+                                    label={t('PreferredLanguage')}
+                                    options={
+                                        maintenancesData?.data?.PreferredLanguage.map((maintenance: MaintenanceInterface) => {
                                             const { SelectTitle, Id } = maintenance
 
                                             return (
-                                                <div key={Id} className="col-lg-6">
-                                                    <div className="mb-3 form-check">
-                                                        <ControllerCheckbox
-                                                            control={control}
-                                                            name={`AcademyProgram-${Id}`}
-                                                            label={SelectTitle || ''}
-                                                        />
-                                                    </div>
-                                                </div>
+                                                <option key={Id} value={Id}>{SelectTitle}</option>
                                             )
                                         })
                                     }
-                                </div>
-                            </div>
-
-                            <div className="col-lg-12">
-                                <div className="hstack gap-2 justify-content-end mt-auto">
-                                    <button type="submit" className="btn btn-primary">{t('Update')}</button>
-                                    <button type="button" className="btn btn-soft-success">{t('Cancel')}</button>
-                                </div>
+                                />
                             </div>
                         </div>
-                        {/*end row*/}
+
+                        <div className="col-lg-12">
+                            <div className="mb-3 form-check">
+                                <ControllerCheckbox
+                                    control={control}
+                                    name="AttendingAnySchools"
+                                    label={t('Attending Any Schools')}
+                                />
+                            </div>
+                        </div>
+
+                        {
+                            AttendingAnySchools &&
+                            <>
+                                <div className="col-lg-12">
+                                    <div className="mb-3">
+                                        <ControllerSelect
+                                            name="AttendingAnySchoolsId"
+                                            control={control}
+                                            label={t('Attending Any Schools')}
+                                            options={
+                                                maintenancesData?.data?.AttendingAnySchools.map((maintenance: MaintenanceInterface) => {
+                                                    const { SelectTitle, Id } = maintenance
+
+                                                    return (
+                                                        <option key={Id} value={Id}>{SelectTitle}</option>
+                                                    )
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                </div>
+
+                                {
+                                    AttendingAnySchoolsId === "5" &&
+                                    <div className="col-lg-12">
+                                        <div className="mb-3">
+                                            <ControllerTextAreaInput
+                                                name="AttendingAnySchoolsExplain"
+                                                control={control}
+                                                label={t('Attending Any Schools Explain')}
+                                                placeholder={`${t('Enter')} ${t('Attending Any Schools Explain')}`}
+                                            />
+                                        </div>
+                                    </div>
+                                }
+                            </>
+                        }
+
+                        <div className="col-lg-6">
+                            <div className="mb-3 form-check">
+                                <ControllerCheckbox
+                                    control={control}
+                                    name="USAVeteran"
+                                    label={t('USA Veteran')}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="col-lg-6">
+                            <div className="mb-3 form-check">
+                                <ControllerCheckbox
+                                    control={control}
+                                    name="NYCHAResident"
+                                    label={t('NYCHA Resident')}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="col-lg-12">
+                            <div className="mb-3">
+                                <ControllerSelect
+                                    name="HowDidYouHearAboutUsId"
+                                    control={control}
+                                    label={t('HowDidYouHearAboutUs')}
+                                    options={
+                                        maintenancesData?.data?.HowDidYouHearAboutUs.map((maintenance: MaintenanceInterface) => {
+                                            const { SelectTitle, Id } = maintenance
+
+                                            return (
+                                                <option key={Id} value={Id}>{SelectTitle}</option>
+                                            )
+                                        })
+                                    }
+                                />
+                            </div>
+                        </div>
+
+                        {
+                            HowDidYouHearAboutUsId === '3' &&
+                            <div className="col-lg-12">
+                                <div className="mb-3">
+                                    <ControllerTextAreaInput
+                                        name="HearABoutUsOther"
+                                        control={control}
+                                        label={t('Hear ABout Us Other')}
+                                        placeholder={`${t('Enter')} ${t('Hear ABout Us Other')}`}
+                                    />
+                                </div>
+                            </div>
+                        }
+
+                        <div className="col-lg-12">
+                            <div className="mb-3">
+                                <ControllerTextAreaInput
+                                    name="AdditionalComments"
+                                    control={control}
+                                    label={t('Additional Comments')}
+                                    placeholder={`${t('Enter')} ${t('Additional Comments')}`}
+                                />
+                            </div>
+                        </div>
+
+
+                        <h4 className="mb-3 mt-3">{t('03- Which Program are you interested in?')}</h4>
+                        <div className="col-lg-12 border mb-3">
+                            <div className="row mt-3">
+                                {
+                                    maintenancesData?.data?.AcademyProgram.map((maintenance: MaintenanceInterface) => {
+                                        const { SelectTitle, Id } = maintenance
+
+                                        return (
+                                            <div key={Id} className="col-lg-6">
+                                                <div className="mb-3 form-check">
+                                                    <ControllerCheckbox
+                                                        control={control}
+                                                        name={`AcademyProgram-${Id}`}
+                                                        label={SelectTitle || ''}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>
+                        </div>
+
+                        <div className="col-lg-12">
+                            <div className="row">
+                                <h4 className="mb-3 mt-3">{t('04 - Previous Education')}</h4>
+                                {
+                                    maintenancesData?.data?.PreviousEducation.map((maintenance: MaintenanceInterface) => {
+                                        const { SelectTitle, Id } = maintenance
+
+                                        return (
+                                            <div key={Id} className="col-lg-6">
+                                                <div className="mb-3 form-check">
+                                                    <ControllerCheckbox
+                                                        control={control}
+                                                        name={`PreviousEducation-${Id}`}
+                                                        label={SelectTitle || ''}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>
+                            {/*end row*/}
+                        </div>
+
+                        <div className="col-lg-12">
+                            <div className="hstack gap-2 justify-content-end mt-auto">
+                                <button type="submit" className="btn btn-primary">{t('Update')}</button>
+                                <button type="button" className="btn btn-soft-success">{t('Cancel')}</button>
+                            </div>
+                        </div>
                     </div>
+
+
                 </div>
             </form>
     )

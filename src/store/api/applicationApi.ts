@@ -7,17 +7,20 @@ export interface ApplicationBody {
     MiddleName: string | null;
     LastName: string;
     NickName: string | null;
+    Gender: string | null;
     AddressLine1: string;
     AddressLine2: string | null;
     CountryId?: string | null;
     StateId?: string | null;
     CityId?: string | null;
+    NationalityId?: string | null;
     PostalCode: string | null;
     DateOfBirth: Date;
     PreferredLanguageId: string;
     EmailAddress: string | null;
     PhoneNumber: string;
     AttendingAnySchools: boolean;
+    AttendingAnySchoolsId: string | null;
     AttendingAnySchoolsExplain: string | null;
     USAVeteran: boolean;
     NYCHAResident: boolean;
@@ -25,7 +28,7 @@ export interface ApplicationBody {
     HearABoutUsOther: string | null;
     AdditionalComments: string | null;
     ApplicationDate: Date;
-    StatusId?: string;
+    StatusId: string;
     OrientationTalk?: boolean;
     OrientationTalkDate?: Date | null;
 }

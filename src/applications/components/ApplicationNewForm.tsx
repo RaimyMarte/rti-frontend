@@ -1,12 +1,12 @@
-import { ApplicationBody, useGetSelectedMaintenancesQuery } from "../../store/api";
+import { ApplicationBody, useGetCitiesQuery, useGetCountriesQuery, useGetNationalitiesQuery, useGetSelectedMaintenancesQuery, useGetStatesQuery } from "../../store/api";
 import { CheckboxComponent, SelectComponent, TextAreaInputComponent, TextInputComponent } from "../../ui/components/form";
 import { delay, isMutationSuccessResponse } from "../../utils";
+import { GeoInterface, MaintenanceInterface } from "../../interfaces";
 import { Loading } from "../../ui/components";
-import { MaintenanceInterface } from "../../interfaces";
 import { useForm, useWatch } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 
 interface ApplicationNewFormProps {
     createApplication: any
@@ -16,7 +16,7 @@ interface ApplicationNewFormProps {
 
 const selectedMaintenances: string[] = [
     'AcademyProgram',
-    'ApplicationStatus',
+    'AttendingAnySchools',
     'HowDidYouHearAboutUs',
     'PreferredLanguage',
     'PreviousEducation',
@@ -38,10 +38,19 @@ export const ApplicationNewForm = ({ createApplication, way }: ApplicationNewFor
         control,
     } = useForm<ApplicationBody>();
 
+    const { data: countries, isLoading: countriesLoading, } = useGetCountriesQuery()
+    const { data: nationalities, isLoading: nationalityLoading, } = useGetNationalitiesQuery()
+
     const AttendingAnySchools = useWatch({ control, name: 'AttendingAnySchools' })
     const HowDidYouHearAboutUsId = useWatch({ control, name: 'HowDidYouHearAboutUsId' })
+    const AttendingAnySchoolsId = useWatch({ control, name: 'AttendingAnySchoolsId' })
+    const CountryId = useWatch({ control, name: "CountryId" }) || ''
+    const StateId = useWatch({ control, name: "StateId" }) || ''
 
-    const isDataLoading = maintenancesDataLoading
+    const { data: states, isLoading: statesLoading, } = useGetStatesQuery(CountryId)
+    const { data: cities, isLoading: citiesLoading, } = useGetCitiesQuery({ countryId: CountryId, stateId: StateId })
+
+    const isDataLoading = maintenancesDataLoading || countriesLoading || nationalityLoading
 
     const onFormSubmit = async (data: ApplicationBody) => {
         try {
@@ -62,7 +71,7 @@ export const ApplicationNewForm = ({ createApplication, way }: ApplicationNewFor
                 } else {
                     const pdfUrl = respData?.data?.PDF;
                     if (pdfUrl) {
-                        await delay(1500); // Delay before opening PDF (optional)
+                        await delay(1500);
                         window.open(`${applicationsPublicUrl}/${pdfUrl}`, '_blank');
                     } else {
                         toast.error("PDF not available for this application");
@@ -80,10 +89,33 @@ export const ApplicationNewForm = ({ createApplication, way }: ApplicationNewFor
             :
             <form onSubmit={handleSubmit(onFormSubmit)} className="tablelist-form">
                 <div className="row">
-                    <div className="col-lg-6">
-                        <h5 className="card-title mb-3">{t('Information')}</h5>
+                    <div className="col-lg-12">
                         <div className="row">
-                            <div className="col-lg-6">
+                            {statesLoading || citiesLoading && <Loading />}
+                            <h4 className=" mb-3">{t('01 - New Application')}</h4>
+                            {
+                                way === 'local'
+                                && <>
+                                    <div className="col-lg-4">
+                                        <div className="mb-3">
+                                            <TextInputComponent
+                                                name="ApplicationDate"
+                                                register={register}
+                                                formErrors={formErrors}
+                                                label={t('Application Date')}
+                                                placeholder={`${t('Enter')} ${t('Application Date')}`}
+                                                type='date'
+                                                rules={{
+                                                    required: `'${t('Application Date')} ${t('is required')}'`,
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="col-lg-8"></div>
+                                </>
+                            }
+
+                            <div className="col-lg-4">
                                 <div className="mb-3">
                                     <TextInputComponent
                                         name="FirstName"
@@ -97,7 +129,7 @@ export const ApplicationNewForm = ({ createApplication, way }: ApplicationNewFor
                                     />
                                 </div>
                             </div>
-                            <div className="col-lg-6">
+                            <div className="col-lg-4">
                                 <div className="mb-3">
                                     <TextInputComponent
                                         name="MiddleName"
@@ -108,7 +140,7 @@ export const ApplicationNewForm = ({ createApplication, way }: ApplicationNewFor
                                     />
                                 </div>
                             </div>
-                            <div className="col-lg-6">
+                            <div className="col-lg-4">
                                 <div className="mb-3">
                                     <TextInputComponent
                                         name="LastName"
@@ -122,7 +154,8 @@ export const ApplicationNewForm = ({ createApplication, way }: ApplicationNewFor
                                     />
                                 </div>
                             </div>
-                            <div className="col-lg-6">
+
+                            <div className="col-lg-4">
                                 <div className="mb-3">
                                     <TextInputComponent
                                         name="NickName"
@@ -134,7 +167,58 @@ export const ApplicationNewForm = ({ createApplication, way }: ApplicationNewFor
                                 </div>
                             </div>
 
-                            <div className="col-lg-6">
+                            <div className="col-lg-4">
+                                <div className="mb-3">
+                                    <SelectComponent
+                                        name="NationalityId"
+                                        register={register}
+                                        formErrors={formErrors}
+                                        label={t('Nationality')}
+                                        options={
+                                            nationalities?.data.map((nationality: GeoInterface) => {
+                                                const { Nationality, Id } = nationality
+
+                                                return (
+                                                    <option key={Id} value={Id}>{Nationality}</option>
+                                                )
+                                            })
+                                        }
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="col-lg-4">
+                                <div className="mb-3">
+                                    <TextInputComponent
+                                        name="DateOfBirth"
+                                        register={register}
+                                        formErrors={formErrors}
+                                        label={t('DateofBirth')}
+                                        placeholder={`${t('Enter')} ${t('DateofBirth')}`}
+                                        type='date'
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="col-lg-4">
+                                <div className="mb-3">
+                                    <SelectComponent
+                                        name="Gender"
+                                        register={register}
+                                        formErrors={formErrors}
+                                        label={t('Gender')}
+                                        options={
+                                            <>
+                                                <option value='M'>{t('Male')} </option>
+                                                <option value='F'>{t('Female')} </option>
+                                                <option value='U'>{t('Unknow')} </option>
+                                            </>
+                                        }
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="col-lg-4">
                                 <div className="mb-3">
                                     <TextInputComponent
                                         name="EmailAddress"
@@ -153,7 +237,7 @@ export const ApplicationNewForm = ({ createApplication, way }: ApplicationNewFor
                                 </div>
                             </div>
 
-                            <div className="col-lg-6">
+                            <div className="col-lg-4">
                                 <div className="mb-3">
                                     <TextInputComponent
                                         name="PhoneNumber"
@@ -161,11 +245,14 @@ export const ApplicationNewForm = ({ createApplication, way }: ApplicationNewFor
                                         formErrors={formErrors}
                                         label={t('Phone Number')}
                                         placeholder={`${t('Enter')} ${t('Phone Number')}`}
+                                        rules={{
+                                            required: `'${t('Phone')} ${t('is required')}'`,
+                                        }}
                                     />
                                 </div>
                             </div>
 
-                            <div className="col-lg-12">
+                            <div className="col-lg-6">
                                 <div className="mb-3">
                                     <TextInputComponent
                                         name="AddressLine1"
@@ -177,16 +264,84 @@ export const ApplicationNewForm = ({ createApplication, way }: ApplicationNewFor
                                             required: `'${t('Address')} ${t('is required')}'`,
                                         }}
                                     />
-                                    <TextInputComponent
-                                        name="AddressLine2"
+                                </div>
+                            </div>
+
+                            <div className="col-lg-3">
+                                <div className="mb-3">
+                                    <SelectComponent
+                                        name="CountryId"
                                         register={register}
                                         formErrors={formErrors}
-                                        placeholder={`${t('Enter')} ${t('Address')}`}
+                                        label={t('Country')}
+                                        options={
+                                            countries?.data.map((country: GeoInterface) => {
+                                                const { Name, Id } = country
+
+                                                return (
+                                                    <option key={Id} value={Id}>{Name}</option>
+                                                )
+                                            })
+                                        }
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="col-lg-3">
+                                <div className="mb-3">
+                                    <SelectComponent
+                                        name="StateId"
+                                        register={register}
+                                        formErrors={formErrors}
+                                        label={t('State')}
+                                        disabled={!CountryId}
+                                        options={
+                                            states?.data.map((state: GeoInterface) => {
+                                                const { Name, Id } = state
+
+                                                return (
+                                                    <option key={Id} value={Id}>{Name}</option>
+                                                )
+                                            })
+                                        }
                                     />
                                 </div>
                             </div>
 
                             <div className="col-lg-6">
+                                <div className="mb-3">
+                                    <TextInputComponent
+                                        name="AddressLine2"
+                                        register={register}
+                                        formErrors={formErrors}
+                                        label="Apt - Number"
+                                        placeholder={`${t('Enter')} ${t('Apt - Number')}`}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="col-lg-3">
+                                <div className="mb-3">
+                                    <SelectComponent
+                                        name="CityId"
+                                        register={register}
+                                        formErrors={formErrors}
+                                        disabled={!StateId && !CountryId}
+                                        label={t('City')}
+                                        options={
+                                            cities?.data.map((city: GeoInterface) => {
+                                                const { Name, Id } = city
+
+                                                return (
+                                                    <option key={Id} value={Id}>{Name}</option>
+                                                )
+                                            })
+                                        }
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="col-lg-3">
                                 <div className="mb-3">
                                     <TextInputComponent
                                         name="PostalCode"
@@ -197,209 +352,205 @@ export const ApplicationNewForm = ({ createApplication, way }: ApplicationNewFor
                                     />
                                 </div>
                             </div>
-
-                            <div className="col-lg-6">
-                                <div className="mb-3">
-                                    <TextInputComponent
-                                        name="DateOfBirth"
-                                        register={register}
-                                        formErrors={formErrors}
-                                        label={t('DateofBirth')}
-                                        placeholder={`${t('Enter')} ${t('DateofBirth')}`}
-                                        type='date'
-                                    />
-                                </div>
-                            </div>
-
-                            {
-                                way === 'local'
-                                && <>
-                                    <h5 className="card-title mb-3 mt-3">{t('Application Information')}</h5>
-                                    <div className="col-lg-6">
-                                        <div className="mb-3">
-                                            <TextInputComponent
-                                                name="ApplicationDate"
-                                                register={register}
-                                                formErrors={formErrors}
-                                                label={t('Application Date')}
-                                                placeholder={`${t('Enter')} ${t('Application Date')}`}
-                                                type='date'
-                                            />
-                                        </div>
-                                    </div>
-                                </>
-                            }
-
-                            <h5 className="card-title mb-3 mt-3">{t('Previous Education')}</h5>
-                            {
-                                maintenancesData?.data?.PreviousEducation.map((maintenance: MaintenanceInterface) => {
-                                    const { SelectTitle, Id } = maintenance
-
-                                    return (
-                                        <div key={Id} className="col-lg-6">
-                                            <div className="mb-3 form-check">
-                                                <CheckboxComponent
-                                                    register={register}
-                                                    name={`PreviousEducation-${Id}`}
-                                                    label={SelectTitle || ''}
-                                                />
-                                            </div>
-                                        </div>
-                                    )
-                                })
-                            }
                         </div>
-                        {/*end row*/}
                     </div>
 
-                    <div className="col-lg-6">
-                        <h5 className="card-title mb-3">{t('Extra Information')}</h5>
-
-                        <div className="row">
-                            <div className="col-lg-12">
-                                <div className="mb-3">
-                                    <SelectComponent
-                                        name="PreferredLanguageId"
-                                        register={register}
-                                        formErrors={formErrors}
-                                        label={t('PreferredLanguage')}
-                                        options={
-                                            maintenancesData?.data?.PreferredLanguage.map((maintenance: MaintenanceInterface) => {
-                                                const { SelectTitle, Id } = maintenance
-
-                                                return (
-                                                    <option key={Id} value={Id}>{SelectTitle}</option>
-                                                )
-                                            })
-                                        }
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="col-lg-12">
-                                <div className="mb-3 form-check">
-                                    <CheckboxComponent
-                                        register={register}
-                                        name="AttendingAnySchools"
-                                        label={t('Attending Any Schools')}
-                                    />
-                                </div>
-                            </div>
-
-                            {
-                                AttendingAnySchools &&
-                                <div className="col-lg-12">
-                                    <div className="mb-3">
-                                        <TextAreaInputComponent
-                                            name="AttendingAnySchoolsExplain"
-                                            register={register}
-                                            formErrors={formErrors}
-                                            label={t('Attending Any Schools Explain')}
-                                            placeholder={`${t('Enter')} ${t('Attending Any Schools Explain')}`}
-                                        />
-                                    </div>
-                                </div>
-                            }
-
-                            <div className="col-lg-6">
-                                <div className="mb-3 form-check">
-                                    <CheckboxComponent
-                                        register={register}
-                                        name="USAVeteran"
-                                        label={t('USA Veteran')}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="col-lg-6">
-                                <div className="mb-3 form-check">
-                                    <CheckboxComponent
-                                        register={register}
-                                        name="NYCHAResident"
-                                        label={t('NYCHA Resident')}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="col-lg-12">
-                                <div className="mb-3">
-                                    <SelectComponent
-                                        name="HowDidYouHearAboutUsId"
-                                        register={register}
-                                        formErrors={formErrors}
-                                        label={t('HowDidYouHearAboutUs')}
-                                        options={
-                                            maintenancesData?.data?.HowDidYouHearAboutUs.map((maintenance: MaintenanceInterface) => {
-                                                const { SelectTitle, Id } = maintenance
-
-                                                return (
-                                                    <option key={Id} value={Id}>{SelectTitle}</option>
-                                                )
-                                            })
-                                        }
-                                    />
-                                </div>
-                            </div>
-
-                            {
-                                HowDidYouHearAboutUsId === '3' &&
-                                <div className="col-lg-12">
-                                    <div className="mb-3">
-                                        <TextAreaInputComponent
-                                            name="HearABoutUsOther"
-                                            register={register}
-                                            formErrors={formErrors}
-                                            label={t('Hear ABout Us Other')}
-                                            placeholder={`${t('Enter')} ${t('Hear ABout Us Other')}`}
-                                        />
-                                    </div>
-                                </div>
-                            }
-
-                            <div className="col-lg-12">
-                                <div className="mb-3">
-                                    <TextAreaInputComponent
-                                        name="AdditionalComments"
-                                        register={register}
-                                        formErrors={formErrors}
-                                        label={t('Additional Comments')}
-                                        placeholder={`${t('Enter')} ${t('Additional Comments')}`}
-                                    />
-                                </div>
-                            </div>
-
-                            <h5 className="card-title mb-3 mt-3">{t('Which Program are you interested in?')}</h5>
-                            <div className="col-lg-12 border mb-3">
-                                <div className="row mt-3">
-                                    {
-                                        maintenancesData?.data?.AcademyProgram.map((maintenance: MaintenanceInterface) => {
+                    <h4 className="mb-3 mt-3">{t('02 - Extra Information')}</h4>
+                    <div className="row">
+                        <div className="col-lg-12">
+                            <div className="mb-3">
+                                <SelectComponent
+                                    name="PreferredLanguageId"
+                                    register={register}
+                                    formErrors={formErrors}
+                                    label={t('PreferredLanguage')}
+                                    options={
+                                        maintenancesData?.data?.PreferredLanguage.map((maintenance: MaintenanceInterface) => {
                                             const { SelectTitle, Id } = maintenance
 
                                             return (
-                                                <div key={Id} className="col-lg-6">
-                                                    <div className="mb-3 form-check">
-                                                        <CheckboxComponent
-                                                            register={register}
-                                                            name={`AcademyProgram-${Id}`}
-                                                            label={SelectTitle || ''}
-                                                        />
-                                                    </div>
-                                                </div>
+                                                <option key={Id} value={Id}>{SelectTitle}</option>
                                             )
                                         })
                                     }
-                                </div>
-                            </div>
-
-                            <div className="col-lg-12">
-                                <div className="hstack gap-2 justify-content-end mt-auto">
-                                    <button type="submit" className="btn btn-primary">{t('Create')}</button>
-                                    <button type="button" className="btn btn-soft-success">{t('Cancel')}</button>
-                                </div>
+                                />
                             </div>
                         </div>
-                        {/*end row*/}
+
+                        <div className="col-lg-12">
+                            <div className="mb-3 form-check">
+                                <CheckboxComponent
+                                    register={register}
+                                    name="AttendingAnySchools"
+                                    label={t('Attending Any Schools')}
+                                />
+                            </div>
+                        </div>
+
+                        {
+                            AttendingAnySchools &&
+                            <>
+                                <div className="col-lg-12">
+                                    <div className="mb-3">
+                                        <SelectComponent
+                                            name="AttendingAnySchoolsId"
+                                            register={register}
+                                            formErrors={formErrors}
+                                            label={t('Attending Any Schools')}
+                                            options={
+                                                maintenancesData?.data?.AttendingAnySchools.map((maintenance: MaintenanceInterface) => {
+                                                    const { SelectTitle, Id } = maintenance
+
+                                                    return (
+                                                        <option key={Id} value={Id}>{SelectTitle}</option>
+                                                    )
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                </div>
+
+                                {
+                                    AttendingAnySchoolsId === "5" &&
+                                    <div className="col-lg-12">
+                                        <div className="mb-3">
+                                            <TextAreaInputComponent
+                                                name="AttendingAnySchoolsExplain"
+                                                register={register}
+                                                formErrors={formErrors}
+                                                label={t('Attending Any Schools Explain')}
+                                                placeholder={`${t('Enter')} ${t('Attending Any Schools Explain')}`}
+                                            />
+                                        </div>
+                                    </div>
+                                }
+                            </>
+                        }
+
+                        <div className="col-lg-6">
+                            <div className="mb-3 form-check">
+                                <CheckboxComponent
+                                    register={register}
+                                    name="USAVeteran"
+                                    label={t('USA Veteran')}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="col-lg-6">
+                            <div className="mb-3 form-check">
+                                <CheckboxComponent
+                                    register={register}
+                                    name="NYCHAResident"
+                                    label={t('NYCHA Resident')}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="col-lg-12">
+                            <div className="mb-3">
+                                <SelectComponent
+                                    name="HowDidYouHearAboutUsId"
+                                    register={register}
+                                    formErrors={formErrors}
+                                    label={t('HowDidYouHearAboutUs')}
+                                    options={
+                                        maintenancesData?.data?.HowDidYouHearAboutUs.map((maintenance: MaintenanceInterface) => {
+                                            const { SelectTitle, Id } = maintenance
+
+                                            return (
+                                                <option key={Id} value={Id}>{SelectTitle}</option>
+                                            )
+                                        })
+                                    }
+                                />
+                            </div>
+                        </div>
+
+                        {
+                            HowDidYouHearAboutUsId === '3' &&
+                            <div className="col-lg-12">
+                                <div className="mb-3">
+                                    <TextAreaInputComponent
+                                        name="HearABoutUsOther"
+                                        register={register}
+                                        formErrors={formErrors}
+                                        label={t('Hear ABout Us Other')}
+                                        placeholder={`${t('Enter')} ${t('Hear ABout Us Other')}`}
+                                    />
+                                </div>
+                            </div>
+                        }
+
+                        <div className="col-lg-12">
+                            <div className="mb-3">
+                                <TextAreaInputComponent
+                                    name="AdditionalComments"
+                                    register={register}
+                                    formErrors={formErrors}
+                                    label={t('Additional Comments')}
+                                    placeholder={`${t('Enter')} ${t('Additional Comments')}`}
+                                />
+                            </div>
+                        </div>
+
+
+                        <h4 className="mb-3 mt-3">{t('03- Which Program are you interested in?')}</h4>
+                        <div className="col-lg-12 border mb-3">
+                            <div className="row mt-3">
+                                {
+                                    maintenancesData?.data?.AcademyProgram.map((maintenance: MaintenanceInterface) => {
+                                        const { SelectTitle, Id } = maintenance
+
+                                        return (
+                                            <div key={Id} className="col-lg-6">
+                                                <div className="mb-3 form-check">
+                                                    <CheckboxComponent
+                                                        register={register}
+                                                        name={`AcademyProgram-${Id}`}
+                                                        label={SelectTitle || ''}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>
+                        </div>
+
+                        <div className="col-lg-12">
+                            <div className="row">
+                                <h4 className="mb-3 mt-3">{t('04 - Previous Education')}</h4>
+                                {
+                                    maintenancesData?.data?.PreviousEducation.map((maintenance: MaintenanceInterface) => {
+                                        const { SelectTitle, Id } = maintenance
+
+                                        return (
+                                            <div key={Id} className="col-lg-6">
+                                                <div className="mb-3 form-check">
+                                                    <CheckboxComponent
+                                                        register={register}
+                                                        name={`PreviousEducation-${Id}`}
+                                                        label={SelectTitle || ''}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>
+                            {/*end row*/}
+                        </div>
+
+                        <div className="col-lg-12">
+                            <div className="hstack gap-2 justify-content-end mt-auto">
+                                <button type="submit" className="btn btn-primary">{t('Create')}</button>
+                                <button type="button" className="btn btn-soft-success">{t('Cancel')}</button>
+                            </div>
+                        </div>
                     </div>
+
+
                 </div>
             </form>
     )
